@@ -1,17 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
+using Devise.Generators;
+using Devise.Utilities;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 
-namespace MyGenerator
+namespace Devise
 {
     [Generator]
-    public class ApiGenerator : ISourceGenerator
+    public class SourceGenerator : ISourceGenerator
     {
         private string DataNamespace;
         private string ApiNamespace;
@@ -23,7 +26,7 @@ namespace MyGenerator
                 Debugger.Launch();
             }
 #endif 
-            context.RegisterForPostInitialization((i) => i.AddSource("DeviseAttribute.cs", attributeText));
+            //context.RegisterForPostInitialization((i) => i.AddSource("DeviseAttribute.g.cs", attributeText));
             context.RegisterForSyntaxNotifications(() => new SyntaxReceiver());
         }
         public void Execute(GeneratorExecutionContext context)
@@ -32,84 +35,39 @@ namespace MyGenerator
             if (!(context.SyntaxContextReceiver is SyntaxReceiver receiver))
                 return;
 
-            DataNamespace = context.Compilation.AssemblyName;
-            ApiNamespace = DataNamespace.Substring(0, DataNamespace.LastIndexOf("."));
-            INamedTypeSymbol attributeSymbol = context.Compilation.GetTypeByMetadataName("Devise.DeviseAttribute");
-            foreach (IGrouping<INamedTypeSymbol, IPropertySymbol> devisablePropertyGroup in receiver.DevisableEntities)
+            if (context.Compilation.AssemblyName.Contains(".Data"))
             {
-                string devisedDTOSource = GenerateDTO(devisablePropertyGroup.Key, devisablePropertyGroup.ToList());
-                context.AddSource($"{devisablePropertyGroup.Key.Name}DTO.cs", SourceText.From(devisedDTOSource, Encoding.UTF8));
-                //GenerateMapping();
-                //GenerateControllerPartial(entityClass);
-                //GenerateBusinessPartial(entityClass);
+                DeviseAttributeGenerator.Generate(context);
+                return;
             }
-
-        }
-        private string GenerateDTO(INamedTypeSymbol classSymbol, List<IPropertySymbol> properties)
-        {
-            StringBuilder sourceBuilder = GetDTOBase();
-            sourceBuilder.Append(classSymbol.Name + "DTO\n\t{");
-            foreach(IPropertySymbol property in properties)
+            if (context.Compilation.AssemblyName.Contains(".Business"))
             {
-                ITypeSymbol propertyType = property.Type;
-                string propertyName = property.Name;
-
-                sourceBuilder.Append($@"
-        public {propertyType} {propertyName} {{ get; set; }}");
 
             }
-            sourceBuilder.Append(GetClassEnd());
-            return sourceBuilder.ToString();
+            if (context.Compilation.AssemblyName.Contains(".Api"))
+            {
+                string jsonPath = "";
+                try
+                {
+                     jsonPath = context.AdditionalFiles.Single(f => f.Path.EndsWith("DeviseConfig.json")).Path;
+                }
+                catch
+                {
+                    //TODO: Add notice that more that one DeviseConfig Json file was found
+                }
+                DeviseConfig config = DeviseConfig.FromJsonFile(jsonPath);
+                
+                //ApiNamespace = context.Compilation.AssemblyName;
+                //DataNamespace = ApiNamespace.Substring(0, ApiNamespace.LastIndexOf(".")) + ".Data";
+                INamedTypeSymbol attributeSymbol = context.Compilation.GetTypeByMetadataName("Devise.DeviseAttribute");
+                IEnumerable<SyntaxTree> devisableEntities = ProjectLoader.LoadDataProject(config);
+                DtoClassGenerator.Generate(context, devisableEntities);
+                MappingProfileGenerator.Generate(context, devisableEntities);
+            }
+
         }
 
         
-
-        private void GenerateControllerPartial(SyntaxTree entityClass)
-        {
-
-        }
-
-        private void GenerateBusinessPartial(SyntaxTree entityClass)
-        {
-
-        }        
-
-        //Devise Attribute Definition
-        private const string attributeText = @"
-using System;
-namespace Devise
-{
-    [AttributeUsage(AttributeTargets.Class , Inherited = false, AllowMultiple = false)]
-    [System.Diagnostics.Conditional(""DeviseGenerator_DEBUG"")]
-    sealed class DeviseAttribute : Attribute
-    {
-        public DeviseAttribute()
-        {
-        }
-        public string ClassName { get; set; }
-    }
-}
-";
-
-        //Class Base StringBuilders
-        private StringBuilder GetDTOBase()
-        {
-
-            return new StringBuilder(@"
-using System;
-using System.Collections.Generic;
-
-namespace " + ApiNamespace + @".DTO
-{
-    public class ");
-
-        }
-
-        //Class End
-        private string GetClassEnd()
-        {
-            return "\n\t}\n}";
-        }
 
         /// <summary>
         /// Created on demand before each generation pass
