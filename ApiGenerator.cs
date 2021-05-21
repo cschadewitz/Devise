@@ -23,7 +23,7 @@ namespace MyGenerator
                 Debugger.Launch();
             }
 #endif 
-            context.RegisterForPostInitialization((i) => i.AddSource("DeviseAttribute.cs", attributeText));
+            context.RegisterForPostInitialization((i) => i.AddSource("DeviseAttribute.g.cs", attributeText));
             context.RegisterForSyntaxNotifications(() => new SyntaxReceiver());
         }
         public void Execute(GeneratorExecutionContext context)
@@ -33,16 +33,17 @@ namespace MyGenerator
                 return;
 
             DataNamespace = context.Compilation.AssemblyName;
-            ApiNamespace = DataNamespace.Substring(0, DataNamespace.LastIndexOf("."));
+            ApiNamespace = DataNamespace.Substring(0, DataNamespace.LastIndexOf(".")) + ".Api";
             INamedTypeSymbol attributeSymbol = context.Compilation.GetTypeByMetadataName("Devise.DeviseAttribute");
             foreach (IGrouping<INamedTypeSymbol, IPropertySymbol> devisablePropertyGroup in receiver.DevisableEntities)
             {
                 string devisedDTOSource = GenerateDTO(devisablePropertyGroup.Key, devisablePropertyGroup.ToList());
-                context.AddSource($"{devisablePropertyGroup.Key.Name}DTO.cs", SourceText.From(devisedDTOSource, Encoding.UTF8));
-                //GenerateMapping();
+                context.AddSource($"{devisablePropertyGroup.Key.Name}DTO.g.cs", SourceText.From(devisedDTOSource, Encoding.UTF8));
                 //GenerateControllerPartial(entityClass);
                 //GenerateBusinessPartial(entityClass);
             }
+            string devisedMappingPartialSource = GenerateMapping(receiver.DevisableEntities);
+            context.AddSource($"MappingProfileApi.g.cs", SourceText.From(devisedMappingPartialSource, Encoding.UTF8));
 
         }
         private string GenerateDTO(INamedTypeSymbol classSymbol, List<IPropertySymbol> properties)
@@ -62,6 +63,22 @@ namespace MyGenerator
             return sourceBuilder.ToString();
         }
 
+        private string GenerateMapping(List<IGrouping<INamedTypeSymbol, IPropertySymbol>> devisableEntities)
+        {
+            StringBuilder sourceBuilder = GetMappingBase();
+            foreach (IGrouping<INamedTypeSymbol, IPropertySymbol> group in devisableEntities)
+            {
+                string entityName = group.Key.Name;
+                string dtoName = group.Key.Name + "DTO";
+                sourceBuilder.Append($@"
+            CreateMap<{entityName}, {dtoName}>();
+            CreateMap<{dtoName}, {entityName}>();");
+            }
+            sourceBuilder.Append(@"
+        }");
+            sourceBuilder.Append(GetClassEnd());
+            return sourceBuilder.ToString();
+        }
         
 
         private void GenerateControllerPartial(SyntaxTree entityClass)
@@ -102,6 +119,23 @@ using System.Collections.Generic;
 namespace " + ApiNamespace + @".DTO
 {
     public class ");
+
+        }
+
+        private StringBuilder GetMappingBase()
+        {
+
+            return new StringBuilder(@"
+using AutoMapper;
+using " + DataNamespace + @";
+using " + ApiNamespace + @".DTO;
+
+namespace " + ApiNamespace + @"
+{
+    public class MappingProfileApi : Profile
+    {
+        public MappingProfileApi()
+        {");
 
         }
 
