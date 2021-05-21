@@ -10,4 +10,5 @@ Built
 
 Forthcoming
 - Generate Api Controller
+- Blazor frontend
 
