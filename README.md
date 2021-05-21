@@ -9,5 +9,5 @@ Built
 - Generate AutoMapper Profile
 
 Forthcoming
-- Generate Api
+- Generate Api Controller
 
