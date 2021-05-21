@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Devise.Generators;
 using Devise.Utilities;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -48,7 +49,7 @@ namespace Devise
                 string jsonPath = "";
                 try
                 {
-                     jsonPath = context.AdditionalFiles.Single(f => Path.GetFileName(f.Path) == "AutoRouteConfig.Json").Path;
+                     jsonPath = context.AdditionalFiles.Single(f => f.Path.EndsWith("DeviseConfig.json")).Path;
                 }
                 catch
                 {
@@ -60,88 +61,13 @@ namespace Devise
                 //DataNamespace = ApiNamespace.Substring(0, ApiNamespace.LastIndexOf(".")) + ".Data";
                 INamedTypeSymbol attributeSymbol = context.Compilation.GetTypeByMetadataName("Devise.DeviseAttribute");
                 IEnumerable<SyntaxTree> devisableEntities = ProjectLoader.LoadDataProject(config);
-                foreach (IGrouping<INamedTypeSymbol, IPropertySymbol> devisablePropertyGroup in receiver.DevisableEntities)
-                {
-                    string devisedDTOSource = GenerateDTO(devisablePropertyGroup.Key, devisablePropertyGroup.ToList());
-                    context.AddSource($"{devisablePropertyGroup.Key.Name}DTO.g.cs", SourceText.From(devisedDTOSource, Encoding.UTF8));
-                    //GenerateControllerPartial(entityClass);
-                    //GenerateBusinessPartial(entityClass);
-                }
-                string devisedMappingPartialSource = GenerateMapping(receiver.DevisableEntities);
-                context.AddSource($"MappingProfileApi.g.cs", SourceText.From(devisedMappingPartialSource, Encoding.UTF8));
+                DtoClassGenerator.Generate(context, devisableEntities);
+                MappingProfileGenerator.Generate(context, devisableEntities);
             }
 
         }
-        private string GenerateDTO(INamedTypeSymbol classSymbol, List<IPropertySymbol> properties)
-        {
-            StringBuilder sourceBuilder = GetDTOBase();
-            sourceBuilder.Append(classSymbol.Name + "DTO\n\t{");
-            foreach(IPropertySymbol property in properties)
-            {
-                ITypeSymbol propertyType = property.Type;
-                string propertyName = property.Name;
 
-                sourceBuilder.Append($@"
-        public {propertyType} {propertyName} {{ get; set; }}");
-
-            }
-            sourceBuilder.Append(GetClassEnd());
-            return sourceBuilder.ToString();
-        }
-
-        private string GenerateMapping(List<IGrouping<INamedTypeSymbol, IPropertySymbol>> devisableEntities)
-        {
-            StringBuilder sourceBuilder = GetMappingBase();
-            foreach (IGrouping<INamedTypeSymbol, IPropertySymbol> group in devisableEntities)
-            {
-                string entityName = group.Key.Name;
-                string dtoName = group.Key.Name + "DTO";
-                sourceBuilder.Append($@"
-            CreateMap<{entityName}, {dtoName}>();
-            CreateMap<{dtoName}, {entityName}>();");
-            }
-            sourceBuilder.Append(@"
-        }");
-            sourceBuilder.Append(GetClassEnd());
-            return sourceBuilder.ToString();
-        }
         
-
-        private void GenerateControllerPartial(SyntaxTree entityClass)
-        {
-
-        }
-
-        private void GenerateBusinessPartial(SyntaxTree entityClass)
-        {
-
-        }        
-
-        //Class Base StringBuilders
-        
-
-        private StringBuilder GetMappingBase()
-        {
-
-            return new StringBuilder(@"
-using AutoMapper;
-using " + DataNamespace + @";
-using " + ApiNamespace + @".DTO;
-
-namespace " + ApiNamespace + @"
-{
-    public class MappingProfileApi : Profile
-    {
-        public MappingProfileApi()
-        {");
-
-        }
-
-        //Class End
-        private string GetClassEnd()
-        {
-            return "\n\t}\n}";
-        }
 
         /// <summary>
         /// Created on demand before each generation pass
