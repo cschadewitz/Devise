@@ -6,8 +6,8 @@ with basic CRUD implementation suitible for use with NSwag for api documentation
 
 Built
 - Intial DTO Generation
+- Generate AutoMapper Profile
 
 Forthcoming
 - Generate Api
-- Generate AutoMapper Profile
 
