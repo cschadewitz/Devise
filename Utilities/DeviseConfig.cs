@@ -6,10 +6,12 @@ using Newtonsoft.Json;
 
 namespace Devise.Utilities
 {
-    public class DeviseConfig
+    internal sealed class DeviseConfig
     {
         public string ConfigPath { get; set; }
         public string DataProject { get; set; }
+        public string ApiProject { get; set; }
+        public string BusinessProject { get; set; }
         private DeviseConfig() { }
         public static DeviseConfig FromJsonFile(string jsonPath)
         {

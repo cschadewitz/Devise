@@ -12,7 +12,7 @@ namespace Devise.Utilities
     public static class ProjectLoader
     {
         public static IEnumerable<SyntaxTree> LoadDataProject(DeviseConfig config)
-{
+        {
             string dataProjectDirectory = Path.GetFullPath(Path.Combine(config.ConfigPath, config.DataProject));
             foreach (var filePath in Directory.GetFiles(dataProjectDirectory, "*.cs", SearchOption.AllDirectories))
             {
