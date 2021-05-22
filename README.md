@@ -9,6 +9,7 @@ Built
 - Generate AutoMapper Profile
 
 Forthcoming
+- Generate Business Logic Layer
 - Generate Api Controller
 - Blazor frontend
 
