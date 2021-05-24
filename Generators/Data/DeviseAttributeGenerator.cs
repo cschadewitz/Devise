@@ -8,8 +8,9 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 
-namespace Devise.Generators
+namespace Devise.Generators.Data
 {
+
     public static class DeviseAttributeGenerator
     {
         //Devise Attribute Definition
@@ -17,14 +18,18 @@ namespace Devise.Generators
 using System;
 namespace Devise
 {
-    [AttributeUsage(AttributeTargets.Class , Inherited = false, AllowMultiple = false)]
-    [System.Diagnostics.Conditional(""DeviseGenerator_DEBUG"")]
+    [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
     sealed class DeviseAttribute : Attribute
     {
         public DeviseAttribute()
         {
+            DTO = true;
+            Api = true;
+            Business = true;
         }
-        public string ClassName { get; set; }
+        public bool DTO { get; set; }
+        public bool Business { get; set; }
+        public bool Api { get; set; }
     }
 }
 ";

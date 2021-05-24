@@ -5,6 +5,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Devise.Generators;
+using Devise.Generators.Data;
+using Devise.Generators.Business;
+using Devise.Generators.Api;
 using Devise.Utilities;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -16,8 +19,6 @@ namespace Devise
     [Generator]
     public class SourceGenerator : ISourceGenerator
     {
-        private string DataNamespace;
-        private string ApiNamespace;
         public void Initialize(GeneratorInitializationContext context)
         {
 #if DEBUG
@@ -25,8 +26,7 @@ namespace Devise
             {
                 Debugger.Launch();
             }
-#endif 
-            //context.RegisterForPostInitialization((i) => i.AddSource("DeviseAttribute.g.cs", attributeText));
+#endif
             context.RegisterForSyntaxNotifications(() => new SyntaxReceiver());
         }
         public void Execute(GeneratorExecutionContext context)
@@ -35,39 +35,28 @@ namespace Devise
             if (!(context.SyntaxContextReceiver is SyntaxReceiver receiver))
                 return;
 
-            if (context.Compilation.AssemblyName.Contains(".Data"))
+            // Load Config
+            DeviseConfig config = DeviseConfig.LoadConfig(context);
+
+            // Generate based on which assembly is running the generator
+            string assemblyName = context.Compilation.AssemblyName;
+            if (assemblyName.Contains(".Data"))
             {
                 DeviseAttributeGenerator.Generate(context);
                 return;
             }
-            if (context.Compilation.AssemblyName.Contains(".Business"))
+            if (assemblyName.Contains(".Business"))
             {
 
             }
-            if (context.Compilation.AssemblyName.Contains(".Api"))
+            if (assemblyName.Contains(".Api"))
             {
-                string jsonPath = "";
-                try
-                {
-                     jsonPath = context.AdditionalFiles.Single(f => f.Path.EndsWith("DeviseConfig.json")).Path;
-                }
-                catch
-                {
-                    //TODO: Add notice that more that one DeviseConfig Json file was found
-                }
-                DeviseConfig config = DeviseConfig.FromJsonFile(jsonPath);
-                
-                //ApiNamespace = context.Compilation.AssemblyName;
-                //DataNamespace = ApiNamespace.Substring(0, ApiNamespace.LastIndexOf(".")) + ".Data";
-                INamedTypeSymbol attributeSymbol = context.Compilation.GetTypeByMetadataName("Devise.DeviseAttribute");
                 IEnumerable<SyntaxTree> devisableEntities = ProjectLoader.LoadDataProject(config);
                 DtoClassGenerator.Generate(context, devisableEntities);
                 MappingProfileGenerator.Generate(context, devisableEntities);
             }
 
-        }
-
-        
+        }        
 
         /// <summary>
         /// Created on demand before each generation pass

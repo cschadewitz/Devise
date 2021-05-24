@@ -9,7 +9,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 
-namespace Devise.Generators
+namespace Devise.Generators.Api
 {
     public static class DtoClassGenerator
     {
