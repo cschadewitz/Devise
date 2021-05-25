@@ -56,5 +56,24 @@ namespace " + ApiNamespace + @".DTO
 
             }
         }
+        public static void Generate(GeneratorExecutionContext context, List<IGrouping<ClassDeclarationSyntax, PropertyDeclarationSyntax>> entities)
+        {
+            ApiNamespace = context.Compilation.AssemblyName;
+            foreach (IGrouping<ClassDeclarationSyntax, PropertyDeclarationSyntax> entity in entities)
+            {
+                NamespaceDeclarationSyntax namespaceDeclaration = entity.Key.Parent as NamespaceDeclarationSyntax;
+                StringBuilder sourceBuilder = GetDTOBase();
+                sourceBuilder.Append(entity.Key.Identifier + "DTO\n\t{");
+                foreach (PropertyDeclarationSyntax property in entity.ToList())
+                {
+                    string propertyType = property.Type.ToString();
+                    string propertyName = property.Identifier.Text;
+                    sourceBuilder.Append($@"
+        public {propertyType} {propertyName} {{ get; set; }}");
+                }
+                sourceBuilder.Append(ClassGeneratorHelpers.GetClassEnd());
+                context.AddSource($"{entity.Key.Identifier}DTO.g.cs", SourceText.From(sourceBuilder.ToString(), Encoding.UTF8));
+            }
+        }
     }
 }

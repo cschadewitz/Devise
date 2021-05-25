@@ -54,5 +54,25 @@ namespace " + ApiNamespace + @"
 
             context.AddSource($"MappingProfileApi.g.cs", SourceText.From(sourceBuilder.ToString(), Encoding.UTF8));
         }
+
+        public static void Generate(GeneratorExecutionContext context, List<IGrouping<ClassDeclarationSyntax, PropertyDeclarationSyntax>> entities)
+        {
+            ApiNamespace = context.Compilation.AssemblyName;
+            DataNamespace = ApiNamespace.Substring(0, ApiNamespace.LastIndexOf(".")) + ".Data";
+            StringBuilder sourceBuilder = GetMappingBase();
+            foreach (IGrouping<ClassDeclarationSyntax, PropertyDeclarationSyntax> entity in entities)
+            {
+                string entityName = entity.Key.Identifier.Text;
+                string dtoName = entityName + "DTO";
+                sourceBuilder.Append($@"
+            CreateMap<{entityName}, {dtoName}>();
+            CreateMap<{dtoName}, {entityName}>();");
+            }
+            sourceBuilder.Append(@"
+        }");
+            sourceBuilder.Append(ClassGeneratorHelpers.GetClassEnd());
+
+            context.AddSource($"MappingProfileApi.g.cs", SourceText.From(sourceBuilder.ToString(), Encoding.UTF8));
+        }
     }
 }

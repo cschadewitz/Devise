@@ -51,7 +51,7 @@ namespace Devise
             }
             if (assemblyName.Contains(".Api"))
             {
-                IEnumerable<SyntaxTree> devisableEntities = ProjectLoader.LoadDataProject(config);
+                List<IGrouping<ClassDeclarationSyntax, PropertyDeclarationSyntax>> devisableEntities = ProjectLoader.LoadDataProjectParsed(context, config);
                 DtoClassGenerator.Generate(context, devisableEntities);
                 MappingProfileGenerator.Generate(context, devisableEntities);
             }
@@ -70,22 +70,9 @@ namespace Devise
             /// </summary>
             public void OnVisitSyntaxNode(GeneratorSyntaxContext context)
             {
-                // any class with at least one attribute is a candidate for property generation
-                if (context.Node is ClassDeclarationSyntax classDeclarationSyntax && classDeclarationSyntax.AttributeLists.Count > 0)
-                {
-                    INamedTypeSymbol classSymbol = context.SemanticModel.GetDeclaredSymbol(classDeclarationSyntax);
-                    //break if the class does not contain the Devise Attribute
-                    if (!classSymbol.GetAttributes().Any(a => a.AttributeClass.ToDisplayString() == "Devise.DeviseAttribute"))
-                        return;
-
-                    List<IPropertySymbol> propertySymbols = new();
-                    //Get symbols for each Property of the class
-                    foreach (PropertyDeclarationSyntax property in classDeclarationSyntax.Members.Where(m => m.IsKind(SyntaxKind.PropertyDeclaration)))
-                    {
-                        propertySymbols.Add(context.SemanticModel.GetDeclaredSymbol(property));
-                    }
-                    DevisableEntities.Add(propertySymbols.GroupBy(p => p.ContainingType).First());
-                }
+                IGrouping<INamedTypeSymbol, IPropertySymbol> entity = SyntaxParser.GetDevisableEntityDetails(context);
+                if (entity is not null)
+                    DevisableEntities.Add(entity);
             }
         }
 

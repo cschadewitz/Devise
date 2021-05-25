@@ -26,10 +26,12 @@ namespace Devise
             DTO = true;
             Api = true;
             Business = true;
+            Mapping = true;
         }
         public bool DTO { get; set; }
         public bool Business { get; set; }
         public bool Api { get; set; }
+        public bool Mapping {get; set; }
     }
 }
 ";
