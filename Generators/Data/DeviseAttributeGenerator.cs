@@ -21,6 +21,9 @@ namespace Devise
     [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
     sealed class DeviseAttribute : Attribute
     {
+        /// <summary>
+        /// Marks a Entity as a Devise target
+        /// </summary>
         public DeviseAttribute()
         {
             DTO = true;

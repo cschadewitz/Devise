@@ -31,18 +31,14 @@ namespace {BusinessNamespace}
             foreach (SyntaxNode propertyNode in propertyNodes)
                 yield return propertyNode as PropertyDeclarationSyntax;
         }
-        public static void Generate(GeneratorExecutionContext context, IEnumerable<SyntaxTree> entities)
+        public static void Generate(GeneratorExecutionContext context, IEnumerable<ClassDeclarationSyntax> devisableEntities)
         {
             BusinessNamespace = context.Compilation.AssemblyName;
             DataNamespace = BusinessNamespace.Substring(0, BusinessNamespace.LastIndexOf(".")) + ".Data";
-            foreach (SyntaxTree entity in entities)
+            foreach (ClassDeclarationSyntax entity in devisableEntities)
             {
-                IEnumerable<PropertyDeclarationSyntax> properties = GetEntityProperties(entity);
-                NamespaceDeclarationSyntax namespaceDeclaration = entity.GetRoot().DescendantNodes().Where(n => n.IsKind(SyntaxKind.NamespaceDeclaration)).FirstOrDefault() as NamespaceDeclarationSyntax;
-                ClassDeclarationSyntax classDeclaration = entity.GetRoot().DescendantNodes().Where(n => n.IsKind(SyntaxKind.ClassDeclaration)).FirstOrDefault() as ClassDeclarationSyntax;
-                INamedTypeSymbol classSymbol = context.Compilation.GetTypeByMetadataName(namespaceDeclaration.Name + "." + classDeclaration.Identifier.Text);
                 StringBuilder sourceBuilder = GetRepositoryBase();
-                sourceBuilder.Append($"{classSymbol.Name}Repository : IRepository<{classSymbol.Name}>\n\t{{");
+                sourceBuilder.Append($"{entity.Identifier}Repository : IRepository<{entity.Identifier}>\n\t{{");
 
                 sourceBuilder.Append(ClassGeneratorHelpers.GetClassEnd());
             }

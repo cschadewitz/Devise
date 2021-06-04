@@ -43,6 +43,7 @@ namespace Devise
             if (assemblyName.Contains(".Data"))
             {
                 DeviseAttributeGenerator.Generate(context);
+                DeviseCustomAttributeGenerator.Generate(context);
                 return;
             }
             if (assemblyName.Contains(".Business"))
@@ -51,7 +52,7 @@ namespace Devise
             }
             if (assemblyName.Contains(".Api"))
             {
-                List<IGrouping<ClassDeclarationSyntax, PropertyDeclarationSyntax>> devisableEntities = ProjectLoader.LoadDataProjectParsed(context, config);
+                List<ClassDeclarationSyntax> devisableEntities = ProjectLoader.LoadDataProject(context, config);
                 DtoClassGenerator.Generate(context, devisableEntities);
                 MappingProfileGenerator.Generate(context, devisableEntities);
             }

@@ -10,6 +10,9 @@ using Microsoft.CodeAnalysis.Text;
 
 namespace Devise.Generators.Data
 {
+    [DeviseCustom("Api", read:true)]
+    [DeviseCustom("Business", read: true, create: false), DeviseCustom("Mapping")]
+    [DeviseCustom("DTO")]
     public static class DeviseCustomAttributeGenerator
     {
         //Devise Attribute Definition
@@ -21,7 +24,7 @@ namespace Devise
     sealed class DeviseCustomAttribute : Attribute
     {
         /// <summary>
-        /// Marks a Devise target for custom implementation
+        /// Marks a Devise generated component for custom implementation
         /// </summary>
         /// <param name=" + "\"target\"" + @">String name of the target to mark for custom implementation. Valid targets - Api, Business, DTO, Mapping.</param>
         /// <param name=" + "\"create\"" + @">Marks Create (post) for custom implementation. Only valid if the attribute target is Api or Business.</param>
@@ -39,7 +42,7 @@ namespace Devise
             List = list;
         }
         /// <summary>
-        /// String name of the target to mark for custom implementation
+        /// Name of the generated target to mark for custom implementation
         /// Valid targets include Api, Business, DTO, Mapping
         /// </summary>
         public string Target { get; }

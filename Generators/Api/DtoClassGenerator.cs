@@ -27,33 +27,31 @@ namespace " + ApiNamespace + @".DTO
     public class ");
 
         }
-        private static IEnumerable<PropertyDeclarationSyntax> GetEntityProperties(SyntaxTree entity)
-        {
-            IEnumerable<SyntaxNode> propertyNodes = entity.GetRoot().DescendantNodes().Where(n => n.IsKind(SyntaxKind.PropertyDeclaration));
-            foreach(SyntaxNode propertyNode in propertyNodes)
-                yield return propertyNode as PropertyDeclarationSyntax;
-        }
-        public static void Generate(GeneratorExecutionContext context, IEnumerable<SyntaxTree> entities)
+        public static void Generate(GeneratorExecutionContext context, List<ClassDeclarationSyntax> devisableEntities)
         {
             ApiNamespace = context.Compilation.AssemblyName;
-            foreach(SyntaxTree entity in entities)
+            foreach(ClassDeclarationSyntax entity in devisableEntities)
             {
-                IEnumerable<PropertyDeclarationSyntax> properties = GetEntityProperties(entity);
-                NamespaceDeclarationSyntax namespaceDeclaration = entity.GetRoot().DescendantNodes().Where(n => n.IsKind(SyntaxKind.NamespaceDeclaration)).FirstOrDefault() as NamespaceDeclarationSyntax;
-                ClassDeclarationSyntax classDeclaration = entity.GetRoot().DescendantNodes().Where(n => n.IsKind(SyntaxKind.ClassDeclaration)).FirstOrDefault() as ClassDeclarationSyntax;
-                INamedTypeSymbol classSymbol = context.Compilation.GetTypeByMetadataName(namespaceDeclaration.Name + "." + classDeclaration.Identifier.Text);
-                StringBuilder sourceBuilder = GetDTOBase();
-                sourceBuilder.Append(classSymbol.Name + "DTO\n\t{");
-                foreach (PropertyDeclarationSyntax property in properties)
+                IEnumerable<PropertyDeclarationSyntax> properties = SyntaxParser.GetEntityProperties(entity);
+                if(!entity.Parent.IsKind(SyntaxKind.NamespaceDeclaration))
                 {
-                    string propertyType = property.Type.ToString();
-                    string propertyName = property.Identifier.Text;
-                    sourceBuilder.Append($@"
-        public {propertyType} {propertyName} {{ get; set; }}");
+                    //Throw Error to user subclasses not supported
                 }
-                sourceBuilder.Append(ClassGeneratorHelpers.GetClassEnd());
-                context.AddSource($"{classDeclaration.Identifier.Text}DTO.g.cs", SourceText.From(sourceBuilder.ToString(), Encoding.UTF8));
-
+                if (!SyntaxParser.GetEntityAttributes(entity).Any(a => a.Name.ToString() == "DeviseCustom" && a.ArgumentList.Arguments.Any(r => r.Expression.ToString() == "DTO")))
+                {
+                    var namespaceDeclaration = entity.Parent as NamespaceDeclarationSyntax;
+                    StringBuilder sourceBuilder = GetDTOBase();
+                    sourceBuilder.Append(entity.Identifier + "DTO\n\t{");
+                    foreach (PropertyDeclarationSyntax property in SyntaxParser.GetEntityProperties(entity))
+                    {
+                        string propertyType = property.Type.ToString();
+                        string propertyName = property.Identifier.Text;
+                        sourceBuilder.Append($@"
+        public {propertyType} {propertyName} {{ get; set; }}");
+                    }
+                    sourceBuilder.Append(ClassGeneratorHelpers.GetClassEnd());
+                    context.AddSource($"{entity.Identifier}DTO.g.cs", SourceText.From(sourceBuilder.ToString(), Encoding.UTF8));
+                }
             }
         }
         public static void Generate(GeneratorExecutionContext context, List<IGrouping<ClassDeclarationSyntax, PropertyDeclarationSyntax>> entities)

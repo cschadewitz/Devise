@@ -12,21 +12,16 @@ namespace Devise.Utilities
 {
     public static class ProjectLoader
     {
-        internal static IEnumerable<SyntaxTree> LoadDataProject(GeneratorExecutionContext context, DeviseConfig config)
+        internal static List<ClassDeclarationSyntax> LoadDataProject(GeneratorExecutionContext context, DeviseConfig config)
         {
+            List<ClassDeclarationSyntax> devisableEntities = new();
             string dataProjectDirectory = Path.GetFullPath(Path.Combine(config.ConfigPath, config.DataProject));
             foreach (var filePath in Directory.GetFiles(dataProjectDirectory, "*.cs", SearchOption.AllDirectories))
             {
                 SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(File.ReadAllText(filePath));
-                SyntaxNode classDeclaration = syntaxTree.GetRoot().DescendantNodes().FirstOrDefault(x => x.IsKind(SyntaxKind.ClassDeclaration));
-                if (classDeclaration is ClassDeclarationSyntax classDeclarationSyntax &&
-                    classDeclarationSyntax.AttributeLists.Count > 0 &&
-                    classDeclarationSyntax.DescendantNodes().Any(n => n.IsKind(SyntaxKind.Attribute) && ((AttributeSyntax)n).Name.ToString() == "Devise"))
-                {
-                    //INamedTypeSymbol classSymbol = context.Compilation.GetSemanticModel(classDeclarationSyntax.SyntaxTree).GetDeclaredSymbol(classDeclarationSyntax);
-                    yield return syntaxTree;
-                }
+                devisableEntities.AddRange(SyntaxParser.GetDevisableEntities(syntaxTree));               
             }
+            return devisableEntities;
         }
         internal static List<IGrouping<ClassDeclarationSyntax, PropertyDeclarationSyntax>> LoadDataProjectParsed(GeneratorExecutionContext context, DeviseConfig config)
 {
