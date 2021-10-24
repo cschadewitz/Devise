@@ -38,8 +38,15 @@ namespace {BusinessNamespace}
             foreach (ClassDeclarationSyntax entity in devisableEntities)
             {
                 StringBuilder sourceBuilder = GetRepositoryBase();
-                sourceBuilder.Append($"{entity.Identifier}Repository : IRepository<{entity.Identifier}>\n\t{{");
-
+                sourceBuilder.Append($"{entity.Identifier}Repository : IRepository<{entity.Identifier}>\n\t{{\n\t\t");
+                //Member Variables
+                sourceBuilder.Append($"private ")
+                //Constructor
+                sourceBuilder.Append($"")
+                //Create Gen
+                sourceBuilder.Append($"public {entity.Identifier} Create({entity.Identifier} item)\n\t\t{{\n\t\t\t");
+                sourceBuilder.Append($"if (item is null)\n\t\t\t{{\n\t\t\t\tthrow new System.ArgumentNullException(nameof(item));\n\t\t\t}\n\t\t\t");
+                sourceBuilder.Append($"")
                 sourceBuilder.Append(ClassGeneratorHelpers.GetClassEnd());
             }
         }
