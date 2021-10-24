@@ -11,7 +11,7 @@ using Microsoft.CodeAnalysis.Text;
 
 namespace Devise.Generators.Api
 {
-    public static class DtoClassGenerator
+    public static class DtoGenerator
     {
 
         private static string ApiNamespace;
