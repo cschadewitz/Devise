@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.CodeAnalysis;
+using Newtonsoft.Json;
 using System.IO;
 using System.Linq;
-using System.Text;
-using Microsoft.CodeAnalysis;
-using Newtonsoft.Json;
 
 namespace Devise.Utilities
 {
@@ -34,7 +31,7 @@ namespace Devise.Utilities
             //If proxy replace jsonPath with the path to the shared config file
             if (jsonPath == null)
                 return null;
-            DeviseConfig config = new DeviseConfig() { ConfigPath = Path.GetDirectoryName(jsonPath) };
+            DeviseConfig config = new() { ConfigPath = Path.GetDirectoryName(jsonPath) };
             JsonConvert.PopulateObject(File.ReadAllText(jsonPath), config);
             return config;
         }

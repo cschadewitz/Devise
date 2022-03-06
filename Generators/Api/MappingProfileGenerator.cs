@@ -1,22 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using Devise.Utilities;
+﻿using Devise.Utilities;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace Devise.Generators.Api
 {
     public static class MappingProfileGenerator
     {
 
-        private static string ApiNamespace;
-        private static string DataNamespace;
-        private static bool HasCustom = false;
+        private static string ApiNamespace { get; set; }
+        private static string DataNamespace { get; set; }
+        private static bool _HasCustom = false;
         private static StringBuilder GetMappingBase()
         {
 
@@ -27,23 +25,25 @@ using " + ApiNamespace + @".DTO;
 
 namespace " + ApiNamespace + @"
 {
-    public " + (HasCustom? "partial " : "") + @"class MappingProfileApi : Profile
+    public " + (_HasCustom ? "partial " : "") + @"class MappingProfileApi : Profile
     {
         public MappingProfileApi()
         {");
 
         }
-        public static void Generate(GeneratorExecutionContext context, List<ClassDeclarationSyntax> devisableEntities)
+        public static void Generate(GeneratorExecutionContext context, IEnumerable<ClassDeclarationSyntax> devisableEntities)
         {
+            if(devisableEntities is null)
+                throw new ArgumentNullException(nameof(devisableEntities));
             ApiNamespace = context.Compilation.AssemblyName;
             DataNamespace = ApiNamespace.Substring(0, ApiNamespace.LastIndexOf(".")) + ".Data";
             StringBuilder sourceBuilder = GetMappingBase();
             foreach (ClassDeclarationSyntax entity in devisableEntities)
             {
-                List<AttributeArgumentSyntax>
+                //List<AttributeArgumentSyntax>
                 if (SyntaxParser.GetEntityAttributes(entity).Any(a => a.Name.ToString() == "DeviseCustom" && a.ArgumentList.Arguments.Any(r => r.Expression.ToString() == "\"MappingProfile\"")))
                 {
-                    HasCustom = true;
+                    _HasCustom = true;
                 }
                 else
                 {
@@ -54,14 +54,14 @@ namespace " + ApiNamespace + @"
             CreateMap<{dtoName}, {entityName}>();");
                 }
             }
-            if (HasCustom)
+            if (_HasCustom)
             {
                 sourceBuilder.Append($@"
             CustomMaps();");
             }
             sourceBuilder.Append(@"
         }");
-            if(HasCustom)
+            if (_HasCustom)
             {
                 sourceBuilder.Append($@"
             public partial static void CustomMaps();");
@@ -73,6 +73,8 @@ namespace " + ApiNamespace + @"
 
         public static void Generate(GeneratorExecutionContext context, List<IGrouping<ClassDeclarationSyntax, PropertyDeclarationSyntax>> entities)
         {
+            if (entities is null)
+                throw new ArgumentNullException(nameof(entities));
             ApiNamespace = context.Compilation.AssemblyName;
             DataNamespace = ApiNamespace.Substring(0, ApiNamespace.LastIndexOf(".")) + ".Data";
             StringBuilder sourceBuilder = GetMappingBase();

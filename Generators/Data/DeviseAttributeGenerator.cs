@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Text;
+﻿using Microsoft.CodeAnalysis;
 
 namespace Devise.Generators.Data
 {
@@ -31,10 +23,10 @@ namespace Devise
             Business = true;
             Mapping = true;
         }
-        public bool DTO { get; set; }
-        public bool Business { get; set; }
+        public bool DTO { get; }
+        public bool Business { get; }
         public bool Api { get; set; }
-        public bool Mapping {get; set; }
+        public bool Mapping {get; }
     }
 }
 ";
@@ -44,5 +36,5 @@ namespace Devise
             context.AddSource("DeviseAttribute.g.cs", deviseAttributeText);
         }
     }
-    
+
 }

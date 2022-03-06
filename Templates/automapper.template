@@ -1,0 +1,17 @@
+using AutoMapper;
+using {DataNamespace};
+using {ApiNamespace}.DTO;
+
+namespace ApiNamespace
+\{
+    public {if MappingHasCustom:partial} MappingProfileApi : Profile
+    \{
+        public MappingProfileApi()
+        \{
+            {for EntityName in EntityNames:
+            CreateMap<{EntityName}, {EntityName}DTO>();
+            CreateMap<{EntityName}DTO, {EntityName}();
+            }
+        \}
+    \}
+\}

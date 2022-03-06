@@ -1,20 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using Devise.Utilities;
+﻿using Devise.Utilities;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
 
 namespace Devise.Generators.Api
 {
     public static class DtoGenerator
     {
+        #region Pre-Cottle Gen Code
+        /*
 
         private static string ApiNamespace;
+
         private static StringBuilder GetDTOBase()
         {
 
@@ -30,10 +33,10 @@ namespace " + ApiNamespace + @".DTO
         public static void Generate(GeneratorExecutionContext context, List<ClassDeclarationSyntax> devisableEntities)
         {
             ApiNamespace = context.Compilation.AssemblyName;
-            foreach(ClassDeclarationSyntax entity in devisableEntities)
+            foreach (ClassDeclarationSyntax entity in devisableEntities)
             {
                 IEnumerable<PropertyDeclarationSyntax> properties = SyntaxParser.GetEntityProperties(entity);
-                if(!entity.Parent.IsKind(SyntaxKind.NamespaceDeclaration))
+                if (!entity.Parent.IsKind(SyntaxKind.NamespaceDeclaration))
                 {
                     //Throw Error to user subclasses not supported
                 }
@@ -72,6 +75,28 @@ namespace " + ApiNamespace + @".DTO
                 sourceBuilder.Append(ClassGeneratorHelpers.GetClassEnd());
                 context.AddSource($"{entity.Key.Identifier}DTO.g.cs", SourceText.From(sourceBuilder.ToString(), Encoding.UTF8));
             }
+        }
+        */
+        #endregion
+        public static void GenerateCottle(GeneratorExecutionContext context, IEnumerable<ClassDeclarationSyntax> devisableEntities)
+        {
+            if (devisableEntities is null)
+                throw new ArgumentNullException(nameof(devisableEntities));
+            string ApiNamespace = context.Compilation.AssemblyName;
+            foreach (ClassDeclarationSyntax entity in devisableEntities)
+            {
+                if (!entity.Parent.IsKind(SyntaxKind.NamespaceDeclaration))
+                {
+                    //Throw Error to user that subclasses are not supported
+                }
+                string renderedCode = CottleRenderer.Render(
+                    File.ReadAllText(@"C:\Users\Shadow\source\repos\Devise\Templates\dto.template"),
+                //TemplateResourceReader.ReadTemplate("dto"), 
+                SyntaxParser.GetEntityCottleContext(entity));
+
+                context.AddSource($"{entity.Identifier}DTO.g.cs", SourceText.From(renderedCode, Encoding.UTF8));
+            }
+
         }
     }
 }

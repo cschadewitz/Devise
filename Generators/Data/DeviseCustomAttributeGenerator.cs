@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Text;
+﻿using Microsoft.CodeAnalysis;
+using System;
 
 namespace Devise.Generators.Data
 {
-    [DeviseCustom("Api", read:true)]
-    [DeviseCustom("Business", read: true, create: false), DeviseCustom("Mapping")]
+    [DeviseCustom("Api", read: true)]
+    [DeviseCustom("Business", read: true, create: true)]
+    [DeviseCustom("Mapping")]
     [DeviseCustom("DTO")]
     public static class DeviseCustomAttributeGenerator
     {
@@ -110,26 +104,26 @@ namespace Devise
         /// Marks Create (post) for custom implementation
         /// Only valid if the attribute target is Api or Business
         /// </summary>
-        public bool Create { get; set; }
+        public bool Create { get; }
         /// <summary>
         /// Marks Read or Get (post) for custom implementation
         /// Only valid if the attribute target is Api or Business
         /// </summary>
-        public bool Read { get; set; }
+        public bool Read { get; }
         /// <summary>
         /// Marks Update or Post (post) for custom implementation
         /// Only valid if the attribute target is Api or Business
         /// </summary>
-        public bool Update { get; set; }
+        public bool Update { get; }
         /// <summary>
         /// Marks Delete or Remove (delete) for custom implementation
         /// Only valid if the attribute target is Api or Business
         /// </summary>
-        public bool Delete { get; set; }
+        public bool Delete { get; }
         /// <summary>
         /// Marks List or Get (get) for custom implementation
         /// Only valid if the attribute target is Api or Business
         /// </summary>
-        public bool List { get; set; }
+        public bool List { get; }
     }
 }

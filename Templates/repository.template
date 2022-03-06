@@ -1,0 +1,10 @@
+using System.Collections.Generic;
+using {DataNamespace}
+
+namespace {BusinessNamespace}
+\{
+	public {if MappingHasCustom:partial} class {EntityName}Repository : IRepository<User>
+	\{
+		
+	\}
+\}

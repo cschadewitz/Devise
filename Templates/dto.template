@@ -1,0 +1,13 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+
+namespace {ApiNamespace}.DTO
+\{
+    public class {EntityName}DTO
+    \{
+        {for Property, Type in EntityProperties:
+        public {Type} {Property} \{ get; set; \}
+        }
+    \}
+\}
