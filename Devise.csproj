@@ -32,23 +32,8 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.9.0" PrivateAssets="all" />
-		<PackageReference Include="Cottle" Version="2.0.4" PrivateAssets="all" IncludeInPackage="true" />
+		<PackageReference Include="Cottle" Version="2.0.4" GeneratePathProperty="true" PrivateAssets="all" IncludeInPackage="true" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" GeneratePathProperty="true" IncludeInPackage="true" PrivateAssets="all" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Compile Update="Properties\Resources.Designer.cs">
-	    <DesignTime>True</DesignTime>
-	    <AutoGen>True</AutoGen>
-	    <DependentUpon>Resources.resx</DependentUpon>
-	  </Compile>
-	</ItemGroup>
-
-	<ItemGroup>
-	  <EmbeddedResource Update="Properties\Resources.resx">
-	    <Generator>ResXFileCodeGenerator</Generator>
-	    <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-	  </EmbeddedResource>
 	</ItemGroup>
 	<PropertyGroup>
 		<GetTargetPathDependsOn>$(GetTargetPathDependsOn);GetDependencyTargetPaths</GetTargetPathDependsOn>
@@ -61,6 +46,7 @@
 	<Target Name="GetDependencyTargetPaths">
 		<ItemGroup>
 			<TargetPathWithTargetPlatformMoniker Include="$(PKGNewtonsoft_Json)\lib\netstandard2.0\Newtonsoft.Json.dll" IncludeRuntimeDependency="false" />
+			<TargetPathWithTargetPlatformMoniker Include="$(PKGCottle)\lib\netstandard2.0\Cottle.dll" IncludeRuntimeDependency="false" />
 		</ItemGroup>
 	</Target>
 	<Target Name="AddNuGetDlls" BeforeTargets="_GetPackageFiles">
