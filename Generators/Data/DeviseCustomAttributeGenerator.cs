@@ -74,6 +74,7 @@ namespace Devise
             context.AddSource("DeviseCustomAttribute.g.cs", deviseCustomAttributeText);
         }
     }
+
     [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
     sealed class DeviseCustomAttribute : Attribute
     {

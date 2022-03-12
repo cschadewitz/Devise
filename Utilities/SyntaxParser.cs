@@ -89,7 +89,7 @@ namespace Devise.Utilities
                 ["EntityName"] = classDeclaration.Identifier.ToString(),
                 ["ApiCustom"] = Value.FromEnumerable(customAttributes["Api"]),
                 ["BusinessCustom"] = Value.FromEnumerable(customAttributes["Business"]),
-                ["Properties"] = Value.FromEnumerable(properties)
+                ["EntityProperties"] = Value.FromEnumerable(properties)
             });
             return entityContext;
         }
@@ -155,7 +155,7 @@ namespace Devise.Utilities
             var properties = new List<KeyValuePair<Value, Value>>();
             foreach (PropertyDeclarationSyntax prop in entityProperties)
             {
-                properties.Add(new KeyValuePair<Value, Value>(prop.Identifier.ToString(), prop.Type.ToString()));
+                properties.Add(new KeyValuePair<Value, Value>(prop.Identifier.Text, prop.Type.ToString()));
             }
             return properties;
         }

@@ -94,7 +94,7 @@ namespace " + ApiNamespace + @".DTO
                 //TemplateResourceReader.ReadTemplate("dto"), 
                 SyntaxParser.GetEntityCottleContext(entity));
 
-                context.AddSource($"{entity.Identifier}DTO.g.cs", SourceText.From(renderedCode, Encoding.UTF8));
+                context.AddSource($"{entity.Identifier.Text}DTO.g.cs", SourceText.From(renderedCode, Encoding.UTF8));
             }
 
         }
