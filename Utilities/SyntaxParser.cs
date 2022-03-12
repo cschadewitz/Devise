@@ -55,19 +55,19 @@ namespace Devise.Utilities
         //    return devisableEntities;
         //}
 
-        internal static List<ClassDeclarationSyntax> GetDevisableEntities(SyntaxTree syntaxTree)
+        internal static IEnumerable<ClassDeclarationSyntax> GetDevisableEntities(SyntaxTree syntaxTree)
         {
-            List<ClassDeclarationSyntax> devisableEntities = new();
+            //List<ClassDeclarationSyntax> devisableEntities = new();
             foreach (SyntaxNode classNode in syntaxTree.GetRoot().DescendantNodes().Where(n => n.IsKind(SyntaxKind.ClassDeclaration)))
             {
                 if (classNode is ClassDeclarationSyntax classDeclaration &&
                 classDeclaration.AttributeLists.Count > 0 &&
                 GetEntityAttributes(classDeclaration).Any(a => a.Name.ToString() == "Devise"))
                 {
-                    devisableEntities.Add(classDeclaration);
+                    yield return classDeclaration;
                 }
             }
-            return devisableEntities;
+            //return devisableEntities;
         }
 
         internal static IContext GetEntityCottleContext(ClassDeclarationSyntax classDeclaration)
@@ -96,7 +96,7 @@ namespace Devise.Utilities
 
         internal static IEnumerable<AttributeSyntax> GetEntityAttributes(ClassDeclarationSyntax classDeclaration)
         {
-            return classDeclaration.AttributeLists.SelectMany(l => l.Attributes).ToList();
+            return classDeclaration.AttributeLists.SelectMany(l => l.Attributes);
         }
 
         internal static IEnumerable<PropertyDeclarationSyntax> GetEntityProperties(ClassDeclarationSyntax classDeclaration)
@@ -152,12 +152,13 @@ namespace Devise.Utilities
 
         internal static IEnumerable<KeyValuePair<Value, Value>> GetEntityCottleProperties(IEnumerable<PropertyDeclarationSyntax> entityProperties)
         {
-            var properties = new List<KeyValuePair<Value, Value>>();
+            //var properties = new List<KeyValuePair<Value, Value>>();
             foreach (PropertyDeclarationSyntax prop in entityProperties)
             {
-                properties.Add(new KeyValuePair<Value, Value>(prop.Identifier.Text, prop.Type.ToString()));
+                //properties.Add(new KeyValuePair<Value, Value>(prop.Identifier.Text, prop.Type.ToString()));
+                yield return new KeyValuePair<Value, Value>(prop.Identifier.Text, prop.Type.ToString());
             }
-            return properties;
+            //return properties;
         }
     }
 }

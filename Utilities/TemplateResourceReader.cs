@@ -11,12 +11,11 @@ namespace Devise.Utilities
             var assembly = Assembly.GetExecutingAssembly();
             string resourcePath = assembly.GetManifestResourceNames().Single(res => res.EndsWith(name + ".template"));
             using (Stream stream = assembly.GetManifestResourceStream(resourcePath))
+            using (StreamReader reader = new StreamReader(stream))
             {
-                using (StreamReader reader = new StreamReader(stream))
-                {
-                    return reader.ReadToEnd();
-                }
+                return reader.ReadToEnd();
             }
+            
         }
     }
 }
