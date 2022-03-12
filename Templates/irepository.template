@@ -1,0 +1,13 @@
+using System.Collections.Generic;
+
+namespace {BusinessNamespace}
+\{
+	public interface IRepository<T> 
+	\{
+		ICollection<T> List();
+		T? GetItem(int id);
+		bool Remove(int id);
+		T Create(T item);
+		void Save(T item);
+	\}
+\}
