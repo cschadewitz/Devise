@@ -41,7 +41,7 @@ namespace " + ApiNamespace + @"
             foreach (ClassDeclarationSyntax entity in devisableEntities)
             {
                 //List<AttributeArgumentSyntax>
-                if (SyntaxParser.GetEntityAttributes(entity).Any(a => a.Name.ToString() == "DeviseCustom" && a.ArgumentList.Arguments.Any(r => r.Expression.ToString() == "\"MappingProfile\"")))
+                if (SyntaxParser.GetEntityAttributes(entity).Any(a => a.Name.ToString() == "DeviseCustom" && a.ArgumentList.Arguments.Any(r => r.Expression.ToString() == "\"Mapping\"")))
                 {
                     _HasCustom = true;
                 }
@@ -64,7 +64,7 @@ namespace " + ApiNamespace + @"
             if (_HasCustom)
             {
                 sourceBuilder.Append($@"
-            public partial static void CustomMaps();");
+            partial void CustomMaps();");
             }
             sourceBuilder.Append(ClassGeneratorHelpers.GetClassEnd());
 
