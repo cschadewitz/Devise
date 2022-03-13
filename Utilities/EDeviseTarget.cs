@@ -2,9 +2,9 @@
 {
     enum DeviseTarget
     {
-        api,
-        business,
-        dto,
-        mapping
+        API,
+        Business,
+        DTO,
+        Mapping
     }
 }

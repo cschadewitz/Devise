@@ -87,7 +87,7 @@ namespace Devise.Utilities
                 ["BusinessNamespace"] = baseNamespace + ".Business",
                 ["DataNamespace"] = baseNamespace + ".Data",
                 ["EntityName"] = classDeclaration.Identifier.ToString(),
-                ["ApiCustom"] = Value.FromEnumerable(customAttributes["Api"]),
+                ["ApiCustom"] = Value.FromEnumerable(customAttributes["API"]),
                 ["BusinessCustom"] = Value.FromEnumerable(customAttributes["Business"]),
                 ["EntityProperties"] = Value.FromEnumerable(properties)
             });
@@ -115,7 +115,7 @@ namespace Devise.Utilities
                 if (attribute.Name.ToString() == "DeviseCustom")
                 {
                     List<AttributeArgumentSyntax> arguments = attribute.ArgumentList.Arguments.ToList();
-                    string customAttributeTarget = arguments[0].Expression.ToString().Capitalize();
+                    string customAttributeTarget = arguments[0].Expression.ToString().TrimQuotes();
                     Dictionary<Value, Value> customAttributeArgs = new Dictionary<Value, Value>();
                     for (int i = 1; i < arguments.Count; i++)
                     {
@@ -144,6 +144,10 @@ namespace Devise.Utilities
                 }
             }
             return customAttributes;
+        }
+        private static string TrimQuotes(this string name)
+        {
+            return name.Trim(new char[] { '"' });
         }
         private static string Capitalize(this string name)
         {
