@@ -1,11 +1,13 @@
 ﻿using Devise.Utilities;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
 
 namespace Devise.Generators.Api
 {
@@ -91,6 +93,19 @@ namespace " + ApiNamespace + @"
             sourceBuilder.Append(ClassGeneratorHelpers.GetClassEnd());
 
             context.AddSource($"MappingProfileApi.g.cs", SourceText.From(sourceBuilder.ToString(), Encoding.UTF8));
+        }
+
+        public static void GenerateCottle(GeneratorExecutionContext context, IEnumerable<ClassDeclarationSyntax> devisableEntities)
+        {
+            if (devisableEntities is null)
+                throw new ArgumentNullException(nameof(devisableEntities));
+            string renderedCode = CottleRenderer.Render(
+                File.ReadAllText(@"C:\Users\Shadow\source\repos\Devise\Templates\automapper.template"),
+            //TemplateResourceReader.ReadTemplate("dto"), 
+            SyntaxParser.GetMappingCottleContext(devisableEntities));
+
+            context.AddSource($"MappingProfileApi.g.cs", SourceText.From(renderedCode, Encoding.UTF8));
+
         }
     }
 }

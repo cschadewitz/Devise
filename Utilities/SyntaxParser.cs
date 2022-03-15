@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
 
 
 namespace Devise.Utilities
@@ -87,11 +88,35 @@ namespace Devise.Utilities
                 ["BusinessNamespace"] = baseNamespace + ".Business",
                 ["DataNamespace"] = baseNamespace + ".Data",
                 ["EntityName"] = classDeclaration.Identifier.ToString(),
-                ["ApiCustom"] = Value.FromEnumerable(customAttributes["API"]),
+                ["ApiCustom"] = Value.FromEnumerable(customAttributes["Api"]),
                 ["BusinessCustom"] = Value.FromEnumerable(customAttributes["Business"]),
+                ["DTOCustom"] = customAttributes.ContainsKey("DTO") ? Value.True : Value.False,
+                ["MappingCustom"] = customAttributes.ContainsKey("Mapping") ? Value.True : Value.False,
                 ["EntityProperties"] = Value.FromEnumerable(properties)
             });
             return entityContext;
+        }
+
+        internal static IContext GetMappingCottleContext(IEnumerable<ClassDeclarationSyntax> classDeclarations)
+        {
+            var entityNames = classDeclarations.Select(entity => Value.FromString(entity.Identifier.ToString()));
+            var attributes = classDeclarations.SelectMany(entity => entity.AttributeLists.SelectMany()
+            var hasCustomMapping = classDeclarations.Any(entity => entity.AttributeLists
+            .SelectMany(l => l.Attributes)
+            .Any(attribute => attribute.ArgumentList.Arguments.ToList()
+            .Any(argument => argument.Expression.ToString() == "Mapping")));
+
+            var namespaceName = (classDeclarations.Single().Parent as NamespaceDeclarationSyntax).Name.ToString();
+            var baseNamespace = namespaceName.Substring(0, namespaceName.LastIndexOf('.'));
+            var mappingContext = Context.CreateBuiltin(new Dictionary<Value, Value>
+            {
+                ["ApiNamespace"] = baseNamespace + ".Api",
+                ["BusinessNamespace"] = baseNamespace + ".Business",
+                ["DataNamespace"] = baseNamespace + ".Data",
+                ["EntityNames"] = Value.FromEnumerable(entityNames),
+                ["MappingHasCustom"] = Value.FromBoolean(hasCustomMapping)
+            });
+            return mappingContext;
         }
 
         internal static IEnumerable<AttributeSyntax> GetEntityAttributes(ClassDeclarationSyntax classDeclaration)
@@ -117,26 +142,32 @@ namespace Devise.Utilities
                     List<AttributeArgumentSyntax> arguments = attribute.ArgumentList.Arguments.ToList();
                     string customAttributeTarget = arguments[0].Expression.ToString().TrimQuotes();
                     Dictionary<Value, Value> customAttributeArgs = new Dictionary<Value, Value>();
+
                     for (int i = 1; i < arguments.Count; i++)
                     {
                         customAttributeArgs.Add(arguments[i].NameColon.Name.ToString().Capitalize(), bool.Parse(arguments[i].Expression.ToString()));
                     }
-                    foreach (string operation in (string[])Enum.GetNames(typeof(Operation)))
-                    {
-                        if (!customAttributeArgs.ContainsKey(operation.Capitalize()))
+                    //If target is Api or Business, fill with false for unstated operations
+                    if(customAttributeTarget.Equals("Api") || customAttributeTarget.Equals("Business"))
+                        foreach (string operation in (string[])Enum.GetNames(typeof(DeviseOperation)))
                         {
-                            customAttributeArgs.Add(operation.Capitalize(), false);
+                            if (!customAttributeArgs.ContainsKey(operation.Capitalize()))
+                            {
+                                customAttributeArgs.Add(operation.Capitalize(), false);
+                            }
                         }
-                    }
+
                     customAttributes.Add(customAttributeTarget, customAttributeArgs.ToList());
                 }
             }
-            foreach (string target in (string[])Enum.GetNames(typeof(DeviseTarget)))
+
+            //Add Api and/or Business, fill with false for operations
+            foreach (string target in new string[] {"Api", "Business"})
             {
                 if (!customAttributes.ContainsKey(target))
                 {
                     List<KeyValuePair<Value, Value>> customAttributeArgs = new List<KeyValuePair<Value, Value>>();
-                    foreach (string operation in (string[])Enum.GetNames(typeof(Operation)))
+                    foreach (string operation in (string[])Enum.GetNames(typeof(DeviseOperation)))
                     {
                         customAttributeArgs.Add(new KeyValuePair<Value, Value>(operation.Capitalize(), false));
                     }

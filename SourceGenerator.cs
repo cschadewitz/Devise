@@ -37,6 +37,7 @@ namespace Devise
             {
                 DeviseAttributeGenerator.Generate(context);
                 DeviseCustomAttributeGenerator.Generate(context);
+                //EnumGenerator.Generate(context);
                 return;
             }
             if (assemblyName.Contains(".Business"))
@@ -47,7 +48,7 @@ namespace Devise
             {
                 IEnumerable<ClassDeclarationSyntax> devisableEntities = ProjectLoader.LoadDataProject(config);
                 DtoGenerator.GenerateCottle(context, devisableEntities);
-                MappingProfileGenerator.Generate(context, devisableEntities);
+                MappingProfileGenerator.GenerateCottle(context, devisableEntities);
 
             }
 

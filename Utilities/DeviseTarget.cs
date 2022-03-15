@@ -2,7 +2,7 @@
 {
     enum DeviseTarget
     {
-        API,
+        Api,
         Business,
         DTO,
         Mapping
