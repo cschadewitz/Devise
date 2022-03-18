@@ -100,9 +100,9 @@ namespace " + ApiNamespace + @"
             if (devisableEntities is null)
                 throw new ArgumentNullException(nameof(devisableEntities));
             string renderedCode = CottleRenderer.Render(
-                File.ReadAllText(@"C:\Users\Shadow\source\repos\Devise\Templates\automapper.template"),
-            //TemplateResourceReader.ReadTemplate("dto"), 
-            SyntaxParser.GetMappingCottleContext(devisableEntities));
+                TemplateResourceReader.ReadTemplate("automapper"), 
+                SyntaxParser.GetMappingCottleContext(devisableEntities)
+                );
 
             context.AddSource($"MappingProfileApi.g.cs", SourceText.From(renderedCode, Encoding.UTF8));
 

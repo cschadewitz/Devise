@@ -89,9 +89,9 @@ namespace " + ApiNamespace + @".DTO
                     //Throw Error to user that subclasses are not supported
                 }
                 string renderedCode = CottleRenderer.Render(
-                    File.ReadAllText(@"C:\Users\Shadow\source\repos\Devise\Templates\dto.template"),
-                //TemplateResourceReader.ReadTemplate("dto"), 
-                SyntaxParser.GetEntityCottleContext(entity));
+                    TemplateResourceReader.ReadTemplate("dto"), 
+                    SyntaxParser.GetEntityCottleContext(entity)
+                    );
 
                 context.AddSource($"{entity.Identifier.Text}DTO.g.cs", SourceText.From(renderedCode, Encoding.UTF8));
             }

@@ -84,6 +84,7 @@ namespace Devise.Utilities
 
             var entityContext = Context.CreateBuiltin(new Dictionary<Value, Value>
             {
+                ["NullableTypes"] = Value.True,
                 ["ApiNamespace"] = baseNamespace + ".Api",
                 ["BusinessNamespace"] = baseNamespace + ".Business",
                 ["DataNamespace"] = baseNamespace + ".Data",
@@ -100,13 +101,11 @@ namespace Devise.Utilities
         internal static IContext GetMappingCottleContext(IEnumerable<ClassDeclarationSyntax> classDeclarations)
         {
             var entityNames = classDeclarations.Select(entity => Value.FromString(entity.Identifier.ToString()));
-            var attributes = classDeclarations.SelectMany(entity => entity.AttributeLists.SelectMany()
-            var hasCustomMapping = classDeclarations.Any(entity => entity.AttributeLists
-            .SelectMany(l => l.Attributes)
-            .Any(attribute => attribute.ArgumentList.Arguments.ToList()
-            .Any(argument => argument.Expression.ToString() == "Mapping")));
+            //Use LINQ to check if a custom mapping is needed
+            //var attributes = classDeclarations.Select(e => e.AttributeLists)
+            var hasCustomMapping = false;
 
-            var namespaceName = (classDeclarations.Single().Parent as NamespaceDeclarationSyntax).Name.ToString();
+            var namespaceName = (classDeclarations.First().Parent as NamespaceDeclarationSyntax).Name.ToString();
             var baseNamespace = namespaceName.Substring(0, namespaceName.LastIndexOf('.'));
             var mappingContext = Context.CreateBuiltin(new Dictionary<Value, Value>
             {
@@ -126,10 +125,7 @@ namespace Devise.Utilities
 
         internal static IEnumerable<PropertyDeclarationSyntax> GetEntityProperties(ClassDeclarationSyntax classDeclaration)
         {
-            foreach (PropertyDeclarationSyntax propertyDeclaration in classDeclaration.Members.Where(m => m.IsKind(SyntaxKind.PropertyDeclaration)))
-            {
-                yield return propertyDeclaration;
-            }
+            return classDeclaration.Members.Where(m => m.IsKind(SyntaxKind.PropertyDeclaration)).Select(p => p as PropertyDeclarationSyntax);
         }
 
         internal static Dictionary<string, IEnumerable<KeyValuePair<Value, Value>>> GetEntityCottleAttributes(IEnumerable<AttributeSyntax> entityAttributes)

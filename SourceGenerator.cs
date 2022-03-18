@@ -31,6 +31,9 @@ namespace Devise
             // Load Config
             DeviseConfig config = DeviseConfig.LoadConfig(context);
 
+            //Pull props from .target file or from .csproj of consuming assembly
+            context.AnalyzerConfigOptions.GlobalOptions.TryGetValue("build_property.Devise_DataProject", out string dataProjectPath);
+
             // Generate based on which assembly is running the generator
             string assemblyName = context.Compilation.AssemblyName;
             if (assemblyName.Contains(".Data"))
