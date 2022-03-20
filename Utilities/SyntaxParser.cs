@@ -10,7 +10,7 @@ using System.Reflection.Metadata;
 
 namespace Devise.Utilities
 {
-    internal static class SyntaxParser
+    public static class SyntaxParser
     {
         //internal static IGrouping<INamedTypeSymbol, IPropertySymbol> GetDevisableEntityDetails(GeneratorSyntaxContext context)
         //{
@@ -56,7 +56,7 @@ namespace Devise.Utilities
         //    return devisableEntities;
         //}
 
-        internal static IEnumerable<ClassDeclarationSyntax> GetDevisableEntities(SyntaxTree syntaxTree)
+        public static IEnumerable<ClassDeclarationSyntax> GetDevisableEntities(SyntaxTree syntaxTree)
         {
             //List<ClassDeclarationSyntax> devisableEntities = new();
             foreach (SyntaxNode classNode in syntaxTree.GetRoot().DescendantNodes().Where(n => n.IsKind(SyntaxKind.ClassDeclaration)))
@@ -71,23 +71,30 @@ namespace Devise.Utilities
             //return devisableEntities;
         }
 
-        internal static IContext GetEntityCottleContext(ClassDeclarationSyntax classDeclaration)
+        public static IContext GetEntityCottleContext(DeviseConfig config, ClassDeclarationSyntax classDeclaration)
         {
+            if(classDeclaration == null)
+                throw new ArgumentNullException(nameof(classDeclaration));
+            if(config == null)
+                throw new ArgumentNullException(nameof(config));
             var entityAttributes = GetEntityAttributes(classDeclaration);
             var entityProperties = GetEntityProperties(classDeclaration);
 
             IEnumerable<KeyValuePair<Value, Value>> properties = GetEntityCottleProperties(entityProperties);
             Dictionary<string, IEnumerable<KeyValuePair<Value, Value>>> customAttributes = GetEntityCottleAttributes(entityAttributes);
 
-            var namespaceName = (classDeclaration.Parent as NamespaceDeclarationSyntax).Name.ToString();
-            var baseNamespace = namespaceName.Substring(0, namespaceName.LastIndexOf('.'));
+            //if(classDeclaration)
+            //var namespaceName = classDeclaration.Parent is not null ? 
+            //    (classDeclaration.Parent as NamespaceDeclarationSyntax).Name.ToString() :
+            //    ;
+            //var baseNamespace = namespaceName.Substring(0, namespaceName.LastIndexOf('.'));
 
             var entityContext = Context.CreateBuiltin(new Dictionary<Value, Value>
             {
                 ["NullableTypes"] = Value.True,
-                ["ApiNamespace"] = baseNamespace + ".Api",
-                ["BusinessNamespace"] = baseNamespace + ".Business",
-                ["DataNamespace"] = baseNamespace + ".Data",
+                ["ApiNamespace"] = config.ApiProjectName,
+                ["BusinessNamespace"] = config.BusinessProjectName,
+                ["DataNamespace"] = config.DataProjectName,
                 ["EntityName"] = classDeclaration.Identifier.ToString(),
                 ["ApiCustom"] = Value.FromEnumerable(customAttributes["Api"]),
                 ["BusinessCustom"] = Value.FromEnumerable(customAttributes["Business"]),
@@ -98,10 +105,10 @@ namespace Devise.Utilities
             return entityContext;
         }
 
-        internal static IContext GetMappingCottleContext(IEnumerable<ClassDeclarationSyntax> classDeclarations)
+        public static IContext GetMappingCottleContext(DeviseConfig config, IEnumerable<ClassDeclarationSyntax> classDeclarations)
         {
             var entityNames = classDeclarations.Select(entity => Value.FromString(entity.Identifier.ToString()));
-            //Use LINQ to check if a custom mapping is needed
+            //TODO: Use LINQ to check if a custom mapping is needed
             //var attributes = classDeclarations.Select(e => e.AttributeLists)
             var hasCustomMapping = false;
 
@@ -109,9 +116,10 @@ namespace Devise.Utilities
             var baseNamespace = namespaceName.Substring(0, namespaceName.LastIndexOf('.'));
             var mappingContext = Context.CreateBuiltin(new Dictionary<Value, Value>
             {
-                ["ApiNamespace"] = baseNamespace + ".Api",
-                ["BusinessNamespace"] = baseNamespace + ".Business",
-                ["DataNamespace"] = baseNamespace + ".Data",
+                ["NullableTypes"] = Value.True,
+                ["ApiNamespace"] = config.ApiProjectName,
+                ["BusinessNamespace"] = config.BusinessProjectName,
+                ["DataNamespace"] = config.DataProjectName,
                 ["EntityNames"] = Value.FromEnumerable(entityNames),
                 ["MappingHasCustom"] = Value.FromBoolean(hasCustomMapping)
             });

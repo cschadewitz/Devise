@@ -4,10 +4,6 @@ using Devise.Utilities;
 
 namespace Devise.Generators.Data
 {
-    [DeviseCustom("Api", Read: true)]
-    [DeviseCustom("Business", Read: true, Create: true)]
-    [DeviseCustom("Mapping")]
-    [DeviseCustom("DTO")]
     public static class DeviseCustomAttributeGenerator
     {
         //Devise Attribute Definition
@@ -21,7 +17,7 @@ namespace Devise
         /// <summary>
         /// Marks a Devise target for custom implementation
         /// </summary>
-        /// <param name=" +"\"Target\"" + @">String name of the target to mark for custom implementation. Valid targets - Api, Business, DTO, Mapping.</param>
+        /// <param name=" +"\"Target\"" + @">String name of the target to mark for custom implementation. Valid targets - Api, Business, Dto, Mapping.</param>
         /// <param name=" + "\"Create\"" + @">Marks Create (post) for custom implementation. Only valid if the attribute target is Api or Business.</param>
         /// <param name=" + "\"Read\"" + @">Marks Read or Get (post) for custom implementation. Only valid if the attribute target is Api or Business.</param>
         /// <param name=" + "\"Update\"" + @">Marks Update or Post (post) for custom implementation. Only valid if the attribute target is Api or Business.</param>
@@ -82,7 +78,7 @@ namespace Devise
         /// <summary>
         /// Marks a Devise target for custom implementation
         /// </summary>
-        /// <param name="Target">String name of the target to mark for custom implementation. Valid targets - Api, Business, DTO, Mapping.</param>
+        /// <param name="Target">String name of the target to mark for custom implementation. Valid targets - Api, Business, Dto, Mapping.</param>
         /// <param name="Create">Marks Create (post) for custom implementation. Only valid if the attribute target is Api or Business.</param>
         /// <param name="Read">Marks Read or Get (post) for custom implementation. Only valid if the attribute target is Api or Business.</param>
         /// <param name="Update">Marks Update or Post (post) for custom implementation. Only valid if the attribute target is Api or Business.</param>

@@ -13,7 +13,8 @@ namespace Devise.Generators.Api
 {
     public static class MappingProfileGenerator
     {
-
+        #region Pre-Cottle Gen Code
+        /*
         private static string ApiNamespace { get; set; }
         private static string DataNamespace { get; set; }
         private static bool _HasCustom = false;
@@ -94,14 +95,16 @@ namespace " + ApiNamespace + @"
 
             context.AddSource($"MappingProfileApi.g.cs", SourceText.From(sourceBuilder.ToString(), Encoding.UTF8));
         }
+        */
+        #endregion
 
-        public static void GenerateCottle(GeneratorExecutionContext context, IEnumerable<ClassDeclarationSyntax> devisableEntities)
+        public static void GenerateCottle(GeneratorExecutionContext context, DeviseConfig config, IEnumerable<ClassDeclarationSyntax> devisableEntities)
         {
             if (devisableEntities is null)
                 throw new ArgumentNullException(nameof(devisableEntities));
             string renderedCode = CottleRenderer.Render(
                 TemplateResourceReader.ReadTemplate("automapper"), 
-                SyntaxParser.GetMappingCottleContext(devisableEntities)
+                SyntaxParser.GetMappingCottleContext(config, devisableEntities)
                 );
 
             context.AddSource($"MappingProfileApi.g.cs", SourceText.From(renderedCode, Encoding.UTF8));

@@ -1,10 +1,10 @@
 ﻿namespace Devise.Utilities
 {
-    public enum DeviseTarget
+    public enum DeviseProjectType
     {
         Api,
         Business,
-        DTO,
-        Mapping
+        Data,
+        Web
     }
 }

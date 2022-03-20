@@ -1,6 +1,6 @@
 ﻿namespace Devise.Utilities
 {
-    enum DeviseOperation
+    public enum DeviseOperation
     {
         Create,
         Read,

@@ -77,11 +77,10 @@ namespace " + ApiNamespace + @".DTO
         }
         */
         #endregion
-        public static void GenerateCottle(GeneratorExecutionContext context, IEnumerable<ClassDeclarationSyntax> devisableEntities)
+        public static void GenerateCottle(GeneratorExecutionContext context, DeviseConfig config, IEnumerable<ClassDeclarationSyntax> devisableEntities)
         {
             if (devisableEntities is null)
                 throw new ArgumentNullException(nameof(devisableEntities));
-            string ApiNamespace = context.Compilation.AssemblyName;
             foreach (ClassDeclarationSyntax entity in devisableEntities)
             {
                 if (!entity.Parent.IsKind(SyntaxKind.NamespaceDeclaration))
@@ -90,7 +89,7 @@ namespace " + ApiNamespace + @".DTO
                 }
                 string renderedCode = CottleRenderer.Render(
                     TemplateResourceReader.ReadTemplate("dto"), 
-                    SyntaxParser.GetEntityCottleContext(entity)
+                    SyntaxParser.GetEntityCottleContext(config, entity)
                     );
 
                 context.AddSource($"{entity.Identifier.Text}DTO.g.cs", SourceText.From(renderedCode, Encoding.UTF8));
