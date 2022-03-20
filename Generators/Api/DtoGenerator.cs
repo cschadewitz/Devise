@@ -6,7 +6,6 @@ using Microsoft.CodeAnalysis.Text;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 
 namespace Devise.Generators.Api
@@ -78,11 +77,10 @@ namespace " + ApiNamespace + @".DTO
         }
         */
         #endregion
-        public static void GenerateCottle(GeneratorExecutionContext context, IEnumerable<ClassDeclarationSyntax> devisableEntities)
+        public static void GenerateCottle(GeneratorExecutionContext context, DeviseConfig config, IEnumerable<ClassDeclarationSyntax> devisableEntities)
         {
             if (devisableEntities is null)
                 throw new ArgumentNullException(nameof(devisableEntities));
-            string ApiNamespace = context.Compilation.AssemblyName;
             foreach (ClassDeclarationSyntax entity in devisableEntities)
             {
                 if (!entity.Parent.IsKind(SyntaxKind.NamespaceDeclaration))
@@ -90,9 +88,9 @@ namespace " + ApiNamespace + @".DTO
                     //Throw Error to user that subclasses are not supported
                 }
                 string renderedCode = CottleRenderer.Render(
-                    File.ReadAllText(@"C:\Users\Shadow\source\repos\Devise\Templates\dto.template"),
-                //TemplateResourceReader.ReadTemplate("dto"), 
-                SyntaxParser.GetEntityCottleContext(entity));
+                    TemplateResourceReader.ReadTemplate("dto"), 
+                    SyntaxParser.GetEntityCottleContext(config, entity)
+                    );
 
                 context.AddSource($"{entity.Identifier.Text}DTO.g.cs", SourceText.From(renderedCode, Encoding.UTF8));
             }

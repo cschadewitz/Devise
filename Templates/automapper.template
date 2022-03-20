@@ -2,16 +2,18 @@ using AutoMapper;
 using {DataNamespace};
 using {ApiNamespace}.DTO;
 
-namespace ApiNamespace
+namespace {ApiNamespace}
 \{
-    public {if MappingHasCustom:partial} MappingProfileApi : Profile
+    partial class MappingProfileApi : Profile
     \{
         public MappingProfileApi()
         \{
             {for EntityName in EntityNames:
             CreateMap<{EntityName}, {EntityName}DTO>();
-            CreateMap<{EntityName}DTO, {EntityName}();
+            CreateMap<{EntityName}DTO, {EntityName}>();
             }
+            {if MappingHasCustom:CustomMaps();}
         \}
+        {if MappingHasCustom:partial void CustomMaps();}
     \}
 \}

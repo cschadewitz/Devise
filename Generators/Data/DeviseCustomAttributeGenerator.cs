@@ -1,12 +1,9 @@
 ﻿using Microsoft.CodeAnalysis;
 using System;
+using Devise.Utilities;
 
 namespace Devise.Generators.Data
 {
-    [DeviseCustom("Api", read: true)]
-    [DeviseCustom("Business", read: true, create: true)]
-    [DeviseCustom("Mapping")]
-    [DeviseCustom("DTO")]
     public static class DeviseCustomAttributeGenerator
     {
         //Devise Attribute Definition
@@ -18,25 +15,25 @@ namespace Devise
     sealed class DeviseCustomAttribute : Attribute
     {
         /// <summary>
-        /// Marks a Devise generated component for custom implementation
+        /// Marks a Devise target for custom implementation
         /// </summary>
-        /// <param name=" + "\"target\"" + @">String name of the target to mark for custom implementation. Valid targets - Api, Business, DTO, Mapping.</param>
-        /// <param name=" + "\"create\"" + @">Marks Create (post) for custom implementation. Only valid if the attribute target is Api or Business.</param>
-        /// <param name=" + "\"read\"" + @">Marks Read or Get (post) for custom implementation. Only valid if the attribute target is Api or Business.</param>
-        /// <param name=" + "\"update\"" + @">Marks Update or Post (post) for custom implementation. Only valid if the attribute target is Api or Business.</param>
-        /// <param name=" + "\"delete\"" + @">Marks Delete or Remove (delete) for custom implementation. Only valid if the attribute target is Api or Business.</param>
-        /// <param name=" + "\"list\"" + @">Marks List or Get (get) for custom implementation. Only valid if the attribute target is Api or Business.</param>
-        public DeviseCustomAttribute(string target, bool create = false, bool read = false, bool update = false, bool delete = false, bool list = false )
+        /// <param name=" +"\"Target\"" + @">String name of the target to mark for custom implementation. Valid targets - Api, Business, Dto, Mapping.</param>
+        /// <param name=" + "\"Create\"" + @">Marks Create (post) for custom implementation. Only valid if the attribute target is Api or Business.</param>
+        /// <param name=" + "\"Read\"" + @">Marks Read or Get (post) for custom implementation. Only valid if the attribute target is Api or Business.</param>
+        /// <param name=" + "\"Update\"" + @">Marks Update or Post (post) for custom implementation. Only valid if the attribute target is Api or Business.</param>
+        /// <param name=" + "\"Delete\"" + @">Marks Delete or Remove (delete) for custom implementation. Only valid if the attribute target is Api or Business.</param>
+        /// <param name=" + "\"List\"" + @">Marks List or Get (get) for custom implementation. Only valid if the attribute target is Api or Business.</param>
+        public DeviseCustomAttribute(string Target, bool Create = false, bool Read = false, bool Update = false, bool Delete = false, bool List = false)
         {
-            Target = target;
-            Create = create;
-            Read = read;
-            Update = update;
-            Delete = delete;
-            List = list;
+            this.Target = Target;
+            this.Create = Create;
+            this.Read = Read;
+            this.Update = Update;
+            this.Delete = Delete;
+            this.List = List;
         }
         /// <summary>
-        /// Name of the generated target to mark for custom implementation
+        /// DeviseTarget to mark for custom implementation
         /// Valid targets include Api, Business, DTO, Mapping
         /// </summary>
         public string Target { get; }
@@ -44,27 +41,27 @@ namespace Devise
         /// Marks Create (post) for custom implementation
         /// Only valid if the attribute target is Api or Business
         /// </summary>
-        public bool Create { get;}
+        public bool Create { get; }
         /// <summary>
         /// Marks Read or Get (post) for custom implementation
         /// Only valid if the attribute target is Api or Business
         /// </summary>
-        public bool Read { get;}
+        public bool Read { get; }
         /// <summary>
         /// Marks Update or Post (post) for custom implementation
         /// Only valid if the attribute target is Api or Business
         /// </summary>
-        public bool Update { get;}
+        public bool Update { get; }
         /// <summary>
         /// Marks Delete or Remove (delete) for custom implementation
         /// Only valid if the attribute target is Api or Business
         /// </summary>
-        public bool Delete { get;}
+        public bool Delete { get; }
         /// <summary>
         /// Marks List or Get (get) for custom implementation
         /// Only valid if the attribute target is Api or Business
         /// </summary>
-        public bool List { get;}
+        public bool List { get; }
     }
 }
 ";
@@ -81,23 +78,23 @@ namespace Devise
         /// <summary>
         /// Marks a Devise target for custom implementation
         /// </summary>
-        /// <param name="target">String name of the target to mark for custom implementation. Valid targets - Api, Business, DTO, Mapping.</param>
-        /// <param name="create">Marks Create (post) for custom implementation. Only valid if the attribute target is Api or Business.</param>
-        /// <param name="read">Marks Read or Get (post) for custom implementation. Only valid if the attribute target is Api or Business.</param>
-        /// <param name="update">Marks Update or Post (post) for custom implementation. Only valid if the attribute target is Api or Business.</param>
-        /// <param name="delete">Marks Delete or Remove (delete) for custom implementation. Only valid if the attribute target is Api or Business.</param>
-        /// <param name="list">Marks List or Get (get) for custom implementation. Only valid if the attribute target is Api or Business.</param>
-        public DeviseCustomAttribute(string target, bool create = false, bool read = false, bool update = false, bool delete = false, bool list = false)
+        /// <param name="Target">String name of the target to mark for custom implementation. Valid targets - Api, Business, Dto, Mapping.</param>
+        /// <param name="Create">Marks Create (post) for custom implementation. Only valid if the attribute target is Api or Business.</param>
+        /// <param name="Read">Marks Read or Get (post) for custom implementation. Only valid if the attribute target is Api or Business.</param>
+        /// <param name="Update">Marks Update or Post (post) for custom implementation. Only valid if the attribute target is Api or Business.</param>
+        /// <param name="Delete">Marks Delete or Remove (delete) for custom implementation. Only valid if the attribute target is Api or Business.</param>
+        /// <param name="List">Marks List or Get (get) for custom implementation. Only valid if the attribute target is Api or Business.</param>
+        public DeviseCustomAttribute(string Target, bool Create = false, bool Read = false, bool Update = false, bool Delete = false, bool List = false)
         {
-            Target = target;
-            Create = create;
-            Read = read;
-            Update = update;
-            Delete = delete;
-            List = list;
+            this.Target = Target;
+            this.Create = Create;
+            this.Read = Read;
+            this.Update = Update;
+            this.Delete = Delete;
+            this.List = List;
         }
         /// <summary>
-        /// String name of the target to mark for custom implementation
+        /// DeviseTarget to mark for custom implementation
         /// Valid targets include Api, Business, DTO, Mapping
         /// </summary>
         public string Target { get; }

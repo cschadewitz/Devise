@@ -3,26 +3,13 @@
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<LangVersion>preview</LangVersion>
+		<Nullable>enable</Nullable>
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Compile Remove="Templates\TemplateTester\**" />
-	  <EmbeddedResource Remove="Templates\TemplateTester\**" />
-	  <None Remove="Templates\TemplateTester\**" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <None Remove="Templates\automapper.template" />
-	  <None Remove="Templates\dto.template" />
-	  <None Remove="Templates\irepository.template" />
-	  <None Remove="Templates\repository.template" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <EmbeddedResource Include="Templates\automapper.template" />
-	  <EmbeddedResource Include="Templates\dto.template" />
-	  <EmbeddedResource Include="Templates\irepository.template" />
-	  <EmbeddedResource Include="Templates\repository.template" />
+	  <Compile Remove="Templates\**" />
+	  <EmbeddedResource Include="Templates\**" />
+	  <None Remove="Templates\**" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -35,12 +22,10 @@
 		<PackageReference Include="Cottle" Version="2.0.4" GeneratePathProperty="true" PrivateAssets="all" IncludeInPackage="true" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" GeneratePathProperty="true" IncludeInPackage="true" PrivateAssets="all" />
 	</ItemGroup>
+	
 	<PropertyGroup>
 		<GetTargetPathDependsOn>$(GetTargetPathDependsOn);GetDependencyTargetPaths</GetTargetPathDependsOn>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-	  <DefineConstants>TRACE</DefineConstants>
 	</PropertyGroup>
 
 	<Target Name="GetDependencyTargetPaths">
@@ -61,8 +46,8 @@
     <Message Importance="High" Text="Adding DLLs from the following packages: @(_PackagesToPack->'%(NuGetPackageId)')" />
 
     <ItemGroup>
-      <None Include="@(_PackagesToPack)" Pack="true" PackagePath="lib/netstandard2.0" Visible="false" />
-      <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="lib/netstandard2.0" Visible="false" />
+      <None Include="@(_PackagesToPack)" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+      <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
     </ItemGroup>
   </Target>
 

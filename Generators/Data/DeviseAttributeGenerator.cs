@@ -46,12 +46,12 @@ namespace Devise
         /// </summary>
         public DeviseAttribute()
         {
-            DTO = true;
+            Dto = true;
             Api = true;
             Business = true;
             Mapping = true;
         }
-        public bool DTO { get; }
+        public bool Dto { get; }
         public bool Business { get; }
         public bool Api { get; set; }
         public bool Mapping { get; }

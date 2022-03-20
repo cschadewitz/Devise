@@ -31,24 +31,20 @@ namespace Devise
             // Load Config
             DeviseConfig config = DeviseConfig.LoadConfig(context);
 
-            // Generate based on which assembly is running the generator
-            string assemblyName = context.Compilation.AssemblyName;
-            if (assemblyName.Contains(".Data"))
+            switch(config.ProjectType)
             {
-                DeviseAttributeGenerator.Generate(context);
-                DeviseCustomAttributeGenerator.Generate(context);
-                return;
-            }
-            if (assemblyName.Contains(".Business"))
-            {
-
-            }
-            if (assemblyName.Contains(".Api"))
-            {
-                IEnumerable<ClassDeclarationSyntax> devisableEntities = ProjectLoader.LoadDataProject(config);
-                DtoGenerator.GenerateCottle(context, devisableEntities);
-                MappingProfileGenerator.Generate(context, devisableEntities);
-
+                case DeviseProjectType.Data:
+                    DeviseAttributeGenerator.Generate(context);
+                    DeviseCustomAttributeGenerator.Generate(context);
+                    //EnumGenerator.Generate(context);
+                    break;
+                case DeviseProjectType.Business:
+                    break;
+                case DeviseProjectType.Api:
+                    IEnumerable<ClassDeclarationSyntax> devisableEntities = ProjectLoader.LoadDataProject(config);
+                    DtoGenerator.GenerateCottle(context, config, devisableEntities);
+                    MappingProfileGenerator.GenerateCottle(context, config, devisableEntities);
+                    break;
             }
 
         }
