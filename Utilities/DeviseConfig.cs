@@ -10,7 +10,6 @@ namespace Devise.Utilities
 {
     public sealed class DeviseConfig
     {
-        private static readonly DiagnosticDescriptor x;
         public string? ConfigPath { get; set; }
         public string? DataProjectPath { get; set; }
         public DeviseProjectType ProjectType { get; set; }
