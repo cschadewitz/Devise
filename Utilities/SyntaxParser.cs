@@ -58,6 +58,8 @@ namespace Devise.Utilities
 
         public static IEnumerable<ClassDeclarationSyntax> GetDevisableEntities(SyntaxTree syntaxTree)
         {
+            if(syntaxTree == null)
+                throw new ArgumentNullException(nameof(syntaxTree));
             //List<ClassDeclarationSyntax> devisableEntities = new();
             foreach (SyntaxNode classNode in syntaxTree.GetRoot().DescendantNodes().Where(n => n.IsKind(SyntaxKind.ClassDeclaration)))
             {
@@ -112,8 +114,8 @@ namespace Devise.Utilities
             //var attributes = classDeclarations.Select(e => e.AttributeLists)
             var hasCustomMapping = false;
 
-            var namespaceName = (classDeclarations.First().Parent as NamespaceDeclarationSyntax).Name.ToString();
-            var baseNamespace = namespaceName.Substring(0, namespaceName.LastIndexOf('.'));
+            //var namespaceName = (classDeclarations.First().Parent as NamespaceDeclarationSyntax).Name.ToString();
+            //var baseNamespace = namespaceName.Substring(0, namespaceName.LastIndexOf('.'));
             var mappingContext = Context.CreateBuiltin(new Dictionary<Value, Value>
             {
                 ["NullableTypes"] = Value.True,

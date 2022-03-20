@@ -85,7 +85,7 @@ namespace Devise.Utilities
             {
                 JsonConvert.PopulateObject(File.ReadAllText(jsonPath), config, settings);
             }
-            catch(JsonSerializationException ex)
+            catch(JsonSerializationException)
             {
                 //TODO: Add diagnostics notification that the json file does not contain all required members
                 throw;
