@@ -31,19 +31,6 @@ namespace Devise
             // Load Config
             DeviseConfig config = DeviseConfig.LoadConfig(context);
 
-            //Pull props from .target file or from .csproj of consuming assembly
-            //context.AnalyzerConfigOptions.GlobalOptions.TryGetValue("build_property.Devise_DataProject", out string dataProjectPath);
-            //
-            //context.AnalyzerConfigOptions.GlobalOptions.TryGetValue("build_property.Devise_ApiProject_Name", out string apiProjectName);
-            //
-            //context.AnalyzerConfigOptions.GlobalOptions.TryGetValue("build_property.Devise_BusinessProject_Name", out string businessProjectName);
-            //
-            //context.AnalyzerConfigOptions.GlobalOptions.TryGetValue("build_property.Devise_DataProject_Name", out string dataProjectName);
-            //
-            //context.AnalyzerConfigOptions.GlobalOptions.TryGetValue("build_property.Devise_WebProject_Name", out string webProjectName);
-
-            // Generate based on which assembly is running the generator
-            //string assemblyName = context.Compilation.AssemblyName;
             switch(config.ProjectType)
             {
                 case DeviseProjectType.Data:
@@ -59,24 +46,6 @@ namespace Devise
                     MappingProfileGenerator.GenerateCottle(context, config, devisableEntities);
                     break;
             }
-            //if (assemblyName.EndsWith(dataProjectName))
-            //{
-            //    DeviseAttributeGenerator.Generate(context);
-            //    DeviseCustomAttributeGenerator.Generate(context);
-            //    //EnumGenerator.Generate(context);
-            //    return;
-            //}
-            //if (assemblyName.EndsWith(businessProjectName))
-            //{
-            //
-            //}
-            //if (assemblyName.EndsWith(apiProjectName))
-            //{
-            //    IEnumerable<ClassDeclarationSyntax> devisableEntities = ProjectLoader.LoadDataProject(config);
-            //    DtoGenerator.GenerateCottle(context, devisableEntities);
-            //    MappingProfileGenerator.GenerateCottle(context, devisableEntities);
-            //
-            //}
 
         }
 

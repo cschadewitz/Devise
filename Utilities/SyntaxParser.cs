@@ -12,55 +12,11 @@ namespace Devise.Utilities
 {
     public static class SyntaxParser
     {
-        //internal static IGrouping<INamedTypeSymbol, IPropertySymbol> GetDevisableEntityDetails(GeneratorSyntaxContext context)
-        //{
-        //    List<IPropertySymbol> propertySymbols = new();
-        //    if (context.Node is ClassDeclarationSyntax classDeclaration &&
-        //        classDeclaration.AttributeLists.Count > 0)
-        //    {
-        //        if (!GetEntityAttributes(classDeclaration).Any(a => a.Name.ToString() == "Devise"))
-        //            return null;
-        //        //Get symbols for each Property of the class
-        //        foreach (PropertyDeclarationSyntax property in classDeclaration.Members.Where(m => m.IsKind(SyntaxKind.PropertyDeclaration)))
-        //        {
-        //            propertySymbols.Add(context.SemanticModel.GetDeclaredSymbol(property));
-        //
-        //        }
-        //    }
-        //    return propertySymbols.GroupBy(p => p.ContainingType).FirstOrDefault();
-        //}
-        //internal static IGrouping<ClassDeclarationSyntax, PropertyDeclarationSyntax> GetDevisableEntityDetails(GeneratorExecutionContext context, SyntaxNode node)
-        //{
-        //    List<PropertyDeclarationSyntax> propertyDeclarations = new();
-        //    if (node is ClassDeclarationSyntax classDeclaration &&
-        //        classDeclaration.AttributeLists.Count > 0)
-        //    {
-        //        if (!GetEntityAttributes(classDeclaration).Any(a => a.Name.ToString() == "Devise"))
-        //            return null;
-        //        //Get symbols for each Property of the class
-        //        foreach (PropertyDeclarationSyntax propertyDeclaration in classDeclaration.Members.Where(m => m.IsKind(SyntaxKind.PropertyDeclaration)))
-        //        {
-        //            propertyDeclarations.Add(propertyDeclaration);
-        //        }
-        //    }
-        //    return propertyDeclarations.GroupBy(p => p.Parent as ClassDeclarationSyntax).FirstOrDefault();
-        //}
-
-        //internal static List<ClassDeclarationSyntax> GetDevisableEntities(GeneratorExecutionContext context)
-        //{
-        //    List<ClassDeclarationSyntax> devisableEntities = new();
-        //    foreach (SyntaxTree tree in context.Compilation.SyntaxTrees.ToList())
-        //    {
-        //        devisableEntities.AddRange(GetDevisableEntities(tree));
-        //    }
-        //    return devisableEntities;
-        //}
-
         public static IEnumerable<ClassDeclarationSyntax> GetDevisableEntities(SyntaxTree syntaxTree)
         {
             if(syntaxTree == null)
                 throw new ArgumentNullException(nameof(syntaxTree));
-            //List<ClassDeclarationSyntax> devisableEntities = new();
+
             foreach (SyntaxNode classNode in syntaxTree.GetRoot().DescendantNodes().Where(n => n.IsKind(SyntaxKind.ClassDeclaration)))
             {
                 if (classNode is ClassDeclarationSyntax classDeclaration &&
@@ -79,18 +35,12 @@ namespace Devise.Utilities
                 throw new ArgumentNullException(nameof(classDeclaration));
             if(config == null)
                 throw new ArgumentNullException(nameof(config));
+
             var entityAttributes = GetEntityAttributes(classDeclaration);
             var entityProperties = GetEntityProperties(classDeclaration);
 
             IEnumerable<KeyValuePair<Value, Value>> properties = GetEntityCottleProperties(entityProperties);
             Dictionary<string, IEnumerable<KeyValuePair<Value, Value>>> customAttributes = GetEntityCottleAttributes(entityAttributes);
-
-            //if(classDeclaration)
-            //var namespaceName = classDeclaration.Parent is not null ? 
-            //    (classDeclaration.Parent as NamespaceDeclarationSyntax).Name.ToString() :
-            //    ;
-            //var baseNamespace = namespaceName.Substring(0, namespaceName.LastIndexOf('.'));
-
             var entityContext = Context.CreateBuiltin(new Dictionary<Value, Value>
             {
                 ["NullableTypes"] = Value.True,
@@ -110,12 +60,11 @@ namespace Devise.Utilities
         public static IContext GetMappingCottleContext(DeviseConfig config, IEnumerable<ClassDeclarationSyntax> classDeclarations)
         {
             var entityNames = classDeclarations.Select(entity => Value.FromString(entity.Identifier.ToString()));
+
             //TODO: Use LINQ to check if a custom mapping is needed
             //var attributes = classDeclarations.Select(e => e.AttributeLists)
             var hasCustomMapping = false;
 
-            //var namespaceName = (classDeclarations.First().Parent as NamespaceDeclarationSyntax).Name.ToString();
-            //var baseNamespace = namespaceName.Substring(0, namespaceName.LastIndexOf('.'));
             var mappingContext = Context.CreateBuiltin(new Dictionary<Value, Value>
             {
                 ["NullableTypes"] = Value.True,
@@ -153,6 +102,7 @@ namespace Devise.Utilities
                     {
                         customAttributeArgs.Add(arguments[i].NameColon.Name.ToString().Capitalize(), bool.Parse(arguments[i].Expression.ToString()));
                     }
+
                     //If target is Api or Business, fill with false for unstated operations
                     if(customAttributeTarget.Equals("Api") || customAttributeTarget.Equals("Business"))
                         foreach (string operation in (string[])Enum.GetNames(typeof(DeviseOperation)))
@@ -182,15 +132,6 @@ namespace Devise.Utilities
             }
             return customAttributes;
         }
-        private static string TrimQuotes(this string name)
-        {
-            return name.Trim(new char[] { '"' });
-        }
-        private static string Capitalize(this string name)
-        {
-            return char.ToUpper(name[0]) + name.Substring(1);
-        }
-
         internal static IEnumerable<KeyValuePair<Value, Value>> GetEntityCottleProperties(IEnumerable<PropertyDeclarationSyntax> entityProperties)
         {
             //var properties = new List<KeyValuePair<Value, Value>>();
