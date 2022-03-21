@@ -7,9 +7,9 @@ with basic CRUD implementation for each entity, suitible for use with NSwag for 
 Built
 - Intial DTO Generation
 - Generate AutoMapper Profile
+- Generate Api Controller
 
 Forthcoming
 - Generate Business Logic Layer
-- Generate Api Controller
 - Blazor frontend
 
