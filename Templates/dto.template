@@ -7,8 +7,6 @@ namespace {ApiNamespace}.DTO
 \{
     public class {EntityName}DTO
     \{
-        {for Property, Type in EntityProperties:
-        public {Type} {Property} \{ get; set; \}
-        }
+        {for Property, Type in EntityProperties:public {Type} {Property} \{ get; set; \}}
     \}
 \}

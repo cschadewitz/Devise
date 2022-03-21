@@ -21,7 +21,6 @@ namespace {ApiNamespace}.Controllers
             Repository = {lcase(EntityName)}Repository ?? throw new System.ArgumentNullException(nameof({lcase(EntityName)}Repository));
             Mapper = mapper ?? throw new System.ArgumentNullException(nameof(mapper));
         \}
-
         {if not(ApiCustom.List):
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<{EntityName}DTO>), StatusCodes.Status200OK)]
@@ -29,9 +28,9 @@ namespace {ApiNamespace}.Controllers
         \{
             return Mapper.Map<IEnumerable<{EntityName}>, IEnumerable<{EntityName}DTO>>(Repository.List());
         \}
-
-        }
-        {if not(ApiCustom.Read):
+        |else:
+        public partial IEnumerable<{EntityName}DTO> Get();
+        }{if not(ApiCustom.Read):
         [HttpGet("\{id\}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof({EntityName}DTO), StatusCodes.Status200OK)]
@@ -42,9 +41,9 @@ namespace {ApiNamespace}.Controllers
                 return NotFound();
             return Mapper.Map<{EntityName}, {EntityName}DTO>({lcase(EntityName)});
         \}
-
-        }
-        {if not(ApiCustom.Delete):
+        |else:
+        public partial ActionResult<{EntityName}DTO?> Get(int id);
+        }{if not(ApiCustom.Delete):
         [HttpDelete("\{id\}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status302Found)]
@@ -54,9 +53,9 @@ namespace {ApiNamespace}.Controllers
                 return Ok();
             return NotFound();
         \}
-
-        }
-        {if not(ApiCustom.Create):
+        |else:
+        public partial ActionResult Delete(int id);
+        }{if not(ApiCustom.Create):
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof({EntityName}DTO), StatusCodes.Status200OK)]
@@ -66,9 +65,9 @@ namespace {ApiNamespace}.Controllers
                 return BadRequest();
             return Mapper.Map<{EntityName}, {EntityName}DTO>(Repository.Create(Mapper.Map<{EntityName}DTO, {EntityName}>({lcase(EntityName)})));
         \}
-
-        }
-        {if not(ApiCustom.Update):
+        |else:
+        public partial ActionResult<{EntityName}DTO?> Post({EntityName}DTO? {lcase(EntityName)});
+        }{if not(ApiCustom.Update):
         [HttpPut("\{id\}")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -86,6 +85,8 @@ namespace {ApiNamespace}.Controllers
             \}
             return NotFound();
         \}
+        |else:
+        public partial ActionResult Put(int id, [FromBody] {EntityName}DTO? {lcase(EntityName)});
         }
     \}
 \}
