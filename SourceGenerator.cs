@@ -44,6 +44,7 @@ namespace Devise
                     IEnumerable<ClassDeclarationSyntax> devisableEntities = ProjectLoader.LoadDataProject(config);
                     DtoGenerator.GenerateCottle(context, config, devisableEntities);
                     MappingProfileGenerator.GenerateCottle(context, config, devisableEntities);
+                    ControllerGenerator.GenerateCottle(context, config, devisableEntities);
                     break;
             }
 
