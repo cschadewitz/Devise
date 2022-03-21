@@ -86,7 +86,7 @@ namespace {ApiNamespace}.Controllers
             return NotFound();
         \}
         |else:
-        public partial ActionResult Put(int id, [FromBody] {EntityName}DTO? {lcase(EntityName)});
+        public partial ActionResult Put(int id, {EntityName}DTO? {lcase(EntityName)});
         }
     \}
 \}
