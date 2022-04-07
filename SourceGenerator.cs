@@ -1,6 +1,7 @@
 ﻿using Devise.Generators.Api;
 using Devise.Generators.Data;
 using Devise.Utilities;
+using Devise.Utilities.Diagnostics;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
@@ -24,31 +25,32 @@ namespace Devise
         }
         public void Execute(GeneratorExecutionContext context)
         {
-            // retrieve the populated receiver 
-            //if (!(context.SyntaxContextReceiver is SyntaxReceiver receiver))
-            //    return;
+      // retrieve the populated receiver 
+      //if (!(context.SyntaxContextReceiver is SyntaxReceiver receiver))
+      //    return;
 
-            // Load Config
-            DeviseConfig config = DeviseConfig.LoadConfig(context);
+      // Load Config
+      DeviseDiagnostics.CreateInstance(context);
+      DeviseConfig config = DeviseConfig.LoadConfig(context);
 
-            switch(config.ProjectType)
-            {
-                case DeviseProjectType.Data:
-                    DeviseAttributeGenerator.Generate(context);
-                    DeviseCustomAttributeGenerator.Generate(context);
-                    //EnumGenerator.Generate(context);
-                    break;
-                case DeviseProjectType.Business:
-                    break;
-                case DeviseProjectType.Api:
-                    IEnumerable<ClassDeclarationSyntax> devisableEntities = ProjectLoader.LoadDataProject(config);
-                    DtoGenerator.GenerateCottle(context, config, devisableEntities);
-                    MappingProfileGenerator.GenerateCottle(context, config, devisableEntities);
-                    ControllerGenerator.GenerateCottle(context, config, devisableEntities);
-                    break;
-            }
+      switch(config.ProjectType)
+      {
+          case DeviseProjectType.Data:
+              DeviseAttributeGenerator.Generate(context);
+              DeviseCustomAttributeGenerator.Generate(context);
+              //EnumGenerator.Generate(context);
+              break;
+          case DeviseProjectType.Business:
+              break;
+          case DeviseProjectType.Api:
+              IEnumerable<ClassDeclarationSyntax> devisableEntities = ProjectLoader.LoadDataProject(config);
+              DtoGenerator.GenerateCottle(context, config, devisableEntities);
+              MappingProfileGenerator.GenerateCottle(context, config, devisableEntities);
+              ControllerGenerator.GenerateCottle(context, config, devisableEntities);
+              break;
+      }
 
-        }
+  }
 
         /// <summary>
         /// Created on demand before each generation pass

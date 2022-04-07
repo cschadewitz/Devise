@@ -13,5 +13,6 @@ namespace Devise.Utilities
         internal static string DataProjectName { get => "build_property.Devise_DataProject_Name"; }
         internal static string WebProjectName { get => "build_property.Devise_WebProject_Name"; }
         internal static string IsNullable { get => "build_property.Devise_Nullable"; }
+        internal static string LoggingFilePath { get => "build_property.Devise_LoggingFilePath"; }
     }
 }

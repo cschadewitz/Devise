@@ -5,10 +5,11 @@ using System.Linq;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using Devise.Utilities.Diagnostics;
 
 namespace Devise.Utilities
 {
-    public sealed class DeviseConfig
+    public class DeviseConfig
     {
         public string? ConfigPath { get; set; }
         public string? DataProjectPath { get; set; }
@@ -50,27 +51,27 @@ namespace Devise.Utilities
             }
             else
             {
-                string jsonPath = "";
-                try
-                {
-                    jsonPath = context.AdditionalFiles.Single(f => f.Path.EndsWith("DeviseConfig.json")).Path;
-                }
-                catch(InvalidOperationException)
-                {
-                    //TODO: Add diagnostics notification that more that one DeviseConfig Json file was found
-                    throw;
-                }
-                catch(NullReferenceException)
-                {
-                    //TODO: Add diagnostics notification that no configfile was found
-                    throw;
-                }
-                return FromJsonFile(jsonPath);
+                return FromJsonFile(context);
             }
         }
 
-        private static DeviseConfig FromJsonFile(string jsonPath)
+        private static DeviseConfig FromJsonFile(GeneratorExecutionContext context)
         {
+            string jsonPath = "";
+            try
+            {
+              jsonPath = context.AdditionalFiles.Single(f => f.Path.EndsWith("DeviseConfig.json")).Path;
+            }
+            catch (InvalidOperationException)
+            {
+              //TODO: Add diagnostics notification that more that one DeviseConfig Json file was found
+              throw;
+            }
+            catch (NullReferenceException)
+            {
+              //TODO: Add diagnostics notification that no configfile was found
+              throw;
+            }
             //Add proxy config so that each projects config points to a single location to load from 
             //If proxy replace jsonPath with the path to the shared config file
             if (jsonPath == null)
@@ -99,7 +100,7 @@ namespace Devise.Utilities
 
             if (!context.AnalyzerConfigOptions.GlobalOptions.TryGetValue(deviseBuildProperty, out string? deviseConfig))
             {
-                //TODO: Add diagnostics notification that Missing Data Project Path
+                DeviseDiagnostics.Instance?.Report(DiagnosticDescriptors.BuildPropertyNotFound, null, deviseBuildProperty.Split('.')[1]);
                 throw new KeyNotFoundException(deviseBuildProperty);
             }
             return deviseConfig;
@@ -109,10 +110,48 @@ namespace Devise.Utilities
         {
             if (!context.AnalyzerConfigOptions.GlobalOptions.TryGetValue(deviseBuildProperty, out string? deviseConfig))
             {
-                //TODO: Add diagnostics notification that Missing deviseBuildProperty
+                DeviseDiagnostics.Instance?.Report(DiagnosticDescriptors.BuildPropertyNotFound, null, deviseBuildProperty.Split('.')[1]);
                 throw new KeyNotFoundException(deviseBuildProperty);
             }
             return deviseConfig.ConvertTo<T>();
+        }
+
+        public static bool TryLoadBuildProp(string deviseBuildProperty, GeneratorExecutionContext context, out string? buildPropertyValue)
+        {
+          if (deviseBuildProperty == null)
+          {
+            buildPropertyValue = default(string);
+            return false;
+          }
+          try
+          {
+            buildPropertyValue = LoadBuildProp(deviseBuildProperty, context);
+            return true;
+          }
+          catch (KeyNotFoundException)
+          {
+            buildPropertyValue = default(string);
+            return false;
+          }
+        }
+
+        public static bool TryLoadBuildProp<T>(string deviseBuildProperty, GeneratorExecutionContext context, out T? buildPropertyValue) where T : IConvertible
+        {
+            if(deviseBuildProperty == null)
+            {
+              buildPropertyValue = default(T);
+              return false;
+            }
+            try
+            {
+                buildPropertyValue = LoadBuildProp<T>(deviseBuildProperty, context);
+                return true;
+            }
+            catch(KeyNotFoundException)
+            {
+                buildPropertyValue = default(T);
+                return false;
+            }
         }
 
 
