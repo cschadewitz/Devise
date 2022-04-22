@@ -7,8 +7,8 @@ namespace Devise.Utilities.Diagnostics
   public class DeviseDiagnostics : IDisposable
   {
     #region poor mans singleton, may replace with DI
-    public static DeviseDiagnostics? Instance 
-    { 
+    public static DeviseDiagnostics? Instance
+    {
       get
       {
         if (Instance is null)
@@ -67,7 +67,7 @@ namespace Devise.Utilities.Diagnostics
     {
       if (diagnostic is null)
         throw new ArgumentNullException(nameof(diagnostic));
-      if(location is null)
+      if (location is null)
         location = Location.None;
       ReportHandler(diagnostic, location, (object[]?)null);
     }

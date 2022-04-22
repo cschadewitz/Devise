@@ -9,26 +9,26 @@ using System.Text;
 
 namespace Devise.Generators.Api
 {
-    public static class ControllerGenerator
+  public static class ControllerGenerator
+  {
+    public static void GenerateCottle(GeneratorExecutionContext context, DeviseConfig config, IEnumerable<ClassDeclarationSyntax> devisableEntities)
     {
-        public static void GenerateCottle(GeneratorExecutionContext context, DeviseConfig config, IEnumerable<ClassDeclarationSyntax> devisableEntities)
+      if (devisableEntities is null)
+        throw new ArgumentNullException(nameof(devisableEntities));
+      foreach (ClassDeclarationSyntax entity in devisableEntities)
+      {
+        if (!entity.Parent.IsKind(SyntaxKind.NamespaceDeclaration))
         {
-            if (devisableEntities is null)
-                throw new ArgumentNullException(nameof(devisableEntities));
-            foreach (ClassDeclarationSyntax entity in devisableEntities)
-            {
-                if (!entity.Parent.IsKind(SyntaxKind.NamespaceDeclaration))
-                {
-                    //Throw Error to user that subclasses are not supported
-                }
-                string renderedCode = CottleRenderer.Render(
-                    TemplateResourceReader.ReadTemplate("controller"),
-                    SyntaxParser.GetEntityCottleContext(config, entity)
-                    );
-
-                context.AddSource($"{entity.Identifier.Text}Controller.g.cs", SourceText.From(renderedCode, Encoding.UTF8));
-            }
-
+          //Throw Error to user that subclasses are not supported
         }
+        string renderedCode = CottleRenderer.Render(
+            TemplateResourceReader.ReadTemplate("controller"),
+            SyntaxParser.GetEntityCottleContext(config, entity)
+            );
+
+        context.AddSource($"{entity.Identifier.Text}Controller.g.cs", SourceText.From(renderedCode, Encoding.UTF8));
+      }
+
     }
+  }
 }

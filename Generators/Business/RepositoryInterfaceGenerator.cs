@@ -8,22 +8,22 @@ using System.Text;
 
 namespace Devise.Generators.Business
 {
-    public static class RepositoryInterefaceGenerator
+  public static class RepositoryInterefaceGenerator
+  {
+    //Devise Attribute Definition
+
+    public static void GenerateCottle(GeneratorExecutionContext context, DeviseConfig config, IEnumerable<ClassDeclarationSyntax> devisableEntities)
     {
-        //Devise Attribute Definition
+      if (devisableEntities is null)
+        throw new ArgumentNullException(nameof(devisableEntities));
+      string renderedCode = CottleRenderer.Render(
+          TemplateResourceReader.ReadTemplate("irepository"),
+          SyntaxParser.GetMappingCottleContext(config, devisableEntities)
+          );
 
-        public static void GenerateCottle(GeneratorExecutionContext context, DeviseConfig config, IEnumerable<ClassDeclarationSyntax> devisableEntities)
-        {
-            if (devisableEntities is null)
-                throw new ArgumentNullException(nameof(devisableEntities));
-            string renderedCode = CottleRenderer.Render(
-                TemplateResourceReader.ReadTemplate("irepository"),
-                SyntaxParser.GetMappingCottleContext(config, devisableEntities)
-                );
+      context.AddSource($"IRepository.g.cs", SourceText.From(renderedCode, Encoding.UTF8));
 
-            context.AddSource($"IRepository.g.cs", SourceText.From(renderedCode, Encoding.UTF8));
-
-        }
     }
+  }
 }
 
